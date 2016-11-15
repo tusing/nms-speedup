@@ -3,7 +3,7 @@ A highly parallelized implementation of non-maximum suppression for object detec
 
 # Installation
 ~~~~
-python3 setup.py build install
+make
 ~~~~
 
 Run optimized functions with
