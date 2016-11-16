@@ -2,8 +2,8 @@
 
 
 /* Scalar naive implementation of NMS, for benchmarking */
-int* nms_c_src(int* a) {
-    return 0;
+void nms_c_src(float* boxes, float* order, float* keep, int n) {
+    return;
 }
 
 /* Scalar naive implementation of NMS, for benchmarking */
