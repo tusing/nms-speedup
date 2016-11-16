@@ -19,6 +19,7 @@ float* iou(float *box1, float *box2) {
 
 
 
+
 /* 	Scalar naive implementation of NMS, for benchmarking
 	for i in range(len(order)):
 		if not keep[order[i]]:
@@ -40,6 +41,7 @@ void* nms_c_src(float *boxes, int *order, int *keep, float threshold, int n) {
   		}
   	}
   	return keep;  
+
 }
 
 /* Vectorized implementation of NMS, for benchmarking */
