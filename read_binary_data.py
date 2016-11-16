@@ -4,7 +4,7 @@ def read_binary_file(filename):
 	boxes: array of [cx, cy, w, h] (center format)
     probs: array of probabilities
 	'''
-	f = open(filename)
+	f = open(filename, "rb")
 	x = f.read(4)
 	classes = []
 	while x:
