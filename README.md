@@ -6,8 +6,7 @@ A highly parallelized implementation of non-maximum suppression for object detec
 make
 ~~~~
 
-Run optimized functions with
+Run tests with 
 ~~~~
-python3 -i nms_optimized.py
+python tests.py
 ~~~~
-
