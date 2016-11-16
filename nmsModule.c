@@ -1,8 +1,11 @@
 #include <stdlib.h>
 #include <math.h>
+#define min(a,b) (((a)<(b))?(a):(b))
+#define max(a,b) (((a)>(b))?(a):(b))
+
 /* BICHEN'S ORIGINAL IOU CODE (wrong? negative values when both boxes same)
 */
-float* iou(float *box1, float *box2) {
+float iou(float *box1, float *box2) {
 	float lr = min(box1[0]+0.5*box1[2], box2[0]+0.5*box2[2]) - 
 			   max(box1[0]-0.5*box1[2], box2[0]-0.5*box2[2]) + 1.0;
 	if(lr > 0) {
@@ -48,11 +51,15 @@ void* nms_simd_src(float *boxes, int *order, int *keep, float threshold, int n) 
   		if(!keep[order[i]]) {
   			continue;
   		}
-  		float boi = boxes[order[i]];
+  		//float boi = boxes + 4*order[i];
   		for(int j=i+1; j<n; j+=4) {
   			/* SIMD SOMETHING HERE 
-				_m128f
-
+				_m128 floats
+				1. vectorize boxes
+				2. constant vector filled with threshold
+				3. vectorize iou on boxes
+				4. simd compare iou and threshold
+				5. vector-setall keep to 0???
   			*/
 
   			// if(iou(boxes[order[i]], boxes[order[j]]) > threshold) {
