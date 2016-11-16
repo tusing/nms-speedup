@@ -5,32 +5,24 @@ from utils import *
 from nms_serial import nms_serial
 
 nms = ctypes.CDLL(os.path.abspath("nms.so"))
-
 testboxes, testprobs = read_binary_file("dataset/boxes.dat")
 testprobs = np.asarray(testprobs)
 
 # Include optimized versions of NMS here
-
-  # Args:
-  #   boxes: array of [cx, cy, w, h] (center format) or [xmin, ymin, xmax, ymax]
-  #   probs: array of probabilities
-  #   threshold: two boxes are considered overlapping if their IOU is largher than
-  #       this threshold
-  #   form: 'center' or 'diagonal'
-  # Returns:
-  #   keep: array of True or False.
-
+# Args:
+#   boxes: array of [cx, cy, w, h] (center format) or [xmin, ymin, xmax, ymax]
+#   probs: array of probabilities
+#   threshold: two boxes are considered overlapping if their IOU is largher than
+#       this threshold
+#   form: 'center' or 'diagonal'
+# Returns:
+#   keep: array of True or False.
 
 
 # C version of NMS, for benchmarking purposes only
-
 def nms_c(boxes, probs, threshold, form='center'):
-    
-    assert form == 'center' or form == 'diagonal', \
-        'bounding box format not accepted: {}.'.format(form)
-
-    if form == 'diagonal':
-        # convert to center format
+    assert form == 'center' or form == 'diagonal', 'bounding box format not accepted: {}.'.format(form)
+    if form == 'diagonal':  # convert to center format
         boxes = [bbox_transform_inv(b) for b in boxes]
 
     c_boxes = flatten(boxes)
@@ -48,37 +40,28 @@ def nms_c(boxes, probs, threshold, form='center'):
     
     return
 
+
 # CPU optimized NMS
 def nms_simd(boxes, probs, threshold, form='center'):
-
-    assert form == 'center' or form == 'diagonal', \
-        'bounding box format not accepted: {}.'.format(form)
-
-    if form == 'diagonal':
-        # convert to center format
+    assert form == 'center' or form == 'diagonal', 'bounding box format not accepted: {}.'.format(form)
+    if form == 'diagonal':  # convert to center format
         boxes = [bbox_transform_inv(b) for b in boxes]
-
-        
-    nms.nms_simd_src() # Work should be done in here
-        
+    nms.nms_simd_src()      # Work should be done in here
     return
+
 
 # GPU optimized NMS
 def nms_gpu(boxes, probs, threshold, form='center'):
-
-    assert form == 'center' or form == 'diagonal', \
-        'bounding box format not accepted: {}.'.format(form)
-
-    if form == 'diagonal':
-        # convert to center format
+    assert form == 'center' or form == 'diagonal', 'bounding box format not accepted: {}.'.format(form)
+    if form == 'diagonal':  # convert to center format
         boxes = [bbox_transform_inv(b) for b in boxes]
     nms.nms_gpu_src()       # Work should be done in here
     return
 
 
 def bbox_transform_inv(bbox):
-    """convert a bbox of form [xmin, ymin, xmax, ymax] to [cx, cy, w, h]. Works
-    for numpy array or list of tensors.
+    """ Convert a bbox of form [xmin, ymin, xmax, ymax] to [cx, cy, w, h]. 
+        Works for numpy array or list of tensors.
     """
     xmin, ymin, xmax, ymax = bbox
     out_box = [[]]*4

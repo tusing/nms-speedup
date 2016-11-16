@@ -3,8 +3,7 @@
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
 
-/* BICHEN'S ORIGINAL IOU CODE (wrong? negative values when both boxes same)
-*/
+/* BICHEN'S ORIGINAL IOU CODE (wrong? negative values when both boxes same) */
 float iou(float *box1, float *box2) {
 	float lr = min(box1[0]+0.5*box1[2], box2[0]+0.5*box2[2]) - 
 			   max(box1[0]-0.5*box1[2], box2[0]-0.5*box2[2]) + 1.0;
@@ -20,7 +19,22 @@ float iou(float *box1, float *box2) {
 	return 0;
 }
 
+/* Source: http://www.pyimagesearch.com/2016/11/07/intersection-over-union-iou-for-object-detection */
+float pyimage_iou(float *box1, float *box2) {
+	// determine the (x, y)-coordinates of the intersection rectangle
+	float xA = max(box1[0], box2[0]);
+	float yA = max(box1[1], box2[1]);
+	float xB = min(box1[2], box2[2]);
+	float yB = min(box1[3], box2[3]);
 
+	// compute area of intersection, prediction, and ground-truth rectangles
+	float interArea = (xB - xA + 1) * (yB - yA + 1);
+	float box1Area = (box1[2] - box1[0] + 1) * (box1[3] - box1[1] + 1);
+	float box2Area = (box2[2] - box2[0] + 1) * (box2[3] - box2[1] + 1);
+
+	// compute and return iou
+	return interArea / (box1Area + box2Area - interArea);
+}
 
 
 /* 	Scalar naive implementation of NMS, for benchmarking
@@ -74,7 +88,6 @@ void* nms_simd_src(float *boxes, int *order, int *keep, float threshold, int n) 
 
 /* GPU implementation of NMS, for benchmarking */
 void* nms_gpu_src(float *boxes, int *order, int *keep, float threshold, int n) {
-
     return 0;
 }
 
