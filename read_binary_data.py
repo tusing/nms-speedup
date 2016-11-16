@@ -17,7 +17,7 @@ def read_binary_file(filename):
 			box.append(struct.unpack('f',f.read(4))[0])
 			box.append(struct.unpack('f',f.read(4))[0])
 			box.append(struct.unpack('f',f.read(4))[0])
-			prob = struct.unpack('f',f.read(4))
+			prob = struct.unpack('f',f.read(4)[0])
 			boxes.append(box)
 			probs.append(prob)
 		classes.append((boxes, probs))
