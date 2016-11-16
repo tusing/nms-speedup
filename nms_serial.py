@@ -1,10 +1,10 @@
 # Author: Bichen Wu (bichen@berkeley.edu) 08/25/2016
 
 """Utility functions used in tf-yolo"""
-import tensorflow as tf
+
 from utils import *
 
-def nms_serial(boxes, probs, threshold, form='center'):
+def nms_serial(boxes, probs, threshold, form='lowerleft'):
     """ Non-Maximum supression.
         Args
             boxes:      array of [cx, cy, w, h] (center format) or [xmin, ymin, xmax, ymax]
@@ -14,9 +14,14 @@ def nms_serial(boxes, probs, threshold, form='center'):
         Returns
             keep:       array of True or False.
     """
-    assert form == 'center' or form == 'diagonal', 'bounding box format not accepted: {}.'.format(form)
-    if form == 'diagonal':  # convert to center format
-        boxes = [bbox_transform_inv(b) for b in boxes]
+    
+    assert form in ['center', 'diagonal', 'lowerleft'], 'bounding box format not accepted: {}.'.format(form)
+    if form == 'diagonal':      # convert to center format
+        boxes = [bbox_diagonal_to_lowerleft(b) for b in boxes]
+    if form == 'center':        # convert to lowerleft format
+        boxes = [bbox_center_to_lowerleft(b) for b in boxes]
+
+        
     order = probs.argsort()[::-1]
     keep = [True]*len(order)
 
@@ -24,6 +29,6 @@ def nms_serial(boxes, probs, threshold, form='center'):
         if not keep[order[i]]:
             continue
         for j in range(i+1, len(order)):
-            if iou(boxes[order[i]], boxes[order[j]]) > threshold:
+            if lowerleft_iou(boxes[order[i]], boxes[order[j]]) > threshold:
                 keep[order[j]] = False
     return keep
