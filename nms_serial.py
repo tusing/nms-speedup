@@ -29,6 +29,7 @@ def nms_serial(boxes, probs, threshold, form='lowerleft'):
         if not keep[order[i]]:
             continue
         for j in range(i+1, len(order)):
-            if lowerleft_iou(boxes[order[i]], boxes[order[j]]) > threshold:
+            iou_result = lowerleft_iou(boxes[order[i]], boxes[order[j]])
+            if iou_result > threshold:
                 keep[order[j]] = False
     return keep

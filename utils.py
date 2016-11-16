@@ -31,6 +31,7 @@ def flatten(lst):
                 newlst.extend(flatten(i))
         return newlst
 
+
 def lowerleft_iou(box1, box2):
         """Compute the Intersection-Over-Union of two given boxes.
         
@@ -46,7 +47,7 @@ def lowerleft_iou(box1, box2):
         x1 = min(box1[0] + box1[2], box2[0] + box2[2])
         y1 = min(box1[1] + box1[3], box2[1] + box2[3])
         
-        area1 = box1[2] * box2[3]
+        area1 = box1[2] * box1[3]
         area2 = box2[2] * box2[3]
         
         if x1 > x0:

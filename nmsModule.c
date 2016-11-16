@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
@@ -20,21 +21,31 @@ float center_iou(float *box1, float *box2) {
     return 0;
 }
 
-/* Source: http://www.pyimagesearch.com/2016/11/07/intersection-over-union-iou-for-object-detection */
 float lowerleft_iou(float *box1, float *box2) {
     // determine the (x, y)-coordinates of the intersection rectangle
-    float xA = max(box1[0], box2[0]);
-    float yA = max(box1[1], box2[1]);
-    float xB = min(box1[2], box2[2]);
-    float yB = min(box1[3], box2[3]);
+    float x0 = max(box1[0], box2[0]);
+    float y0 = max(box1[1], box2[1]);
+    float x1 = min(box1[0] + box1[2], box2[0] + box2[2]);
+    float y1 = min(box1[1] + box1[3], box2[1] + box2[3]);
     
-    // compute area of intersection, prediction, and ground-truth rectangles
-    float interArea = (xB - xA + 1) * (yB - yA + 1);
-    float box1Area = (box1[2] - box1[0] + 1) * (box1[3] - box1[1] + 1);
-    float box2Area = (box2[2] - box2[0] + 1) * (box2[3] - box2[1] + 1);
+
+    float box1Area = box1[2] * box1[3];
+    float box2Area = box2[2] * box2[3];
+
+    float union_area = 0;
+    if (x1 > x0) {
+        union_area = (x1 - x0) * (y1 - y0);
+    }
+
+    union_area = max(union_area, 0);
+    float tot_area = box1Area + box2Area - union_area;
     
-    // compute and return iou
-    return interArea / (box1Area + box2Area - interArea);
+    if (tot_area > 0) {
+        return min(1.0, union_area / tot_area); /* Round to 1 bc fp division is sketchy */
+    } else {
+        return 0;
+    }
+    
 }
 
 
@@ -47,23 +58,25 @@ float lowerleft_iou(float *box1, float *box2) {
 		        keep[order[j]] = False
 	return keep
 */
-void* nms_c_src(float *boxes, int *order, int *keep, float threshold, int n) {
+void nms_c_src(float *boxes, int *order, int *keep, float threshold, int n) {
+
     for(int i=0; i<n; i++) {
-        if(!keep[order[i]]) {
+        if(keep[order[i]] == 0) {
             continue;
         }
         for(int j=i+1; j<n; j++) {
-            if(iou(boxes + 4*order[i], boxes + 4*order[j]) > threshold) {
+            float iou_result = lowerleft_iou(boxes+4*order[i], boxes+4*order[j]);
+            if(iou_result > threshold) {
                 keep[order[j]] = 0;
-            }
+            }   
         }
     }
-    return keep;  
+
     
 }
 
 /* Vectorized implementation of NMS, for benchmarking */
-void* nms_simd_src(float *boxes, int *order, int *keep, float threshold, int n) {
+void nms_simd_src(float *boxes, int *order, int *keep, float threshold, int n) {
     for(int i=0; i<n; i++) {
         if(!keep[order[i]]) {
             continue;
@@ -84,11 +97,11 @@ void* nms_simd_src(float *boxes, int *order, int *keep, float threshold, int n) 
             // }
         }
     }
-    return keep;
+
 }
 
 /* GPU implementation of NMS, for benchmarking */
-void* nms_gpu_src(float *boxes, int *order, int *keep, float threshold, int n) {
-    return 0;
+void nms_gpu_src(float *boxes, int *order, int *keep, float threshold, int n) {
+
 }
 
