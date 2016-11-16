@@ -1,12 +1,10 @@
 import ctypes
 import os
-import numpy as np
 from utils import *
 from nms_serial import nms_serial
 
 nms = ctypes.CDLL(os.path.abspath("nms.so"))
-testboxes, testprobs = read_binary_file("dataset/boxes.dat")
-testprobs = np.asarray(testprobs)
+
 
 # Include optimized versions of NMS here
 # Args:
@@ -40,9 +38,15 @@ def nms_c(boxes, probs, threshold, form='lowerleft'):
     c_keep = (ctypes.c_int * len(keep))(*keep)
 
     c_threshold = (ctypes.c_float)(float(threshold))
-    newkeeps = nms.nms_c_src(c_boxes, c_order, c_keep,  len(keep)) # Work should be done in here
-    
-    return newkeeps
+
+    c_len = (ctypes.c_int)(len(keep))
+
+
+    nms.nms_c_src(c_boxes, c_order, c_keep, c_threshold, c_len) # Work should be done in here
+
+
+    keep = [c_keep[i] is 1 for i in range(len(c_keep))]
+    return keep
 
 
 # CPU optimized NMS
