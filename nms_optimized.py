@@ -18,10 +18,7 @@ nms = ctypes.CDLL(os.path.abspath("nms.so"))
 # Returns:
 #   keep: array of True or False.
 
-
-# C version of NMS, for benchmarking purposes only
-def nms_c(boxes, probs, threshold, form='lowerleft'):
-
+def nms_harness(c_func, boxes, probs, threshold, form='lowerleft'):
     assert form in ['center', 'diagonal', 'lowerleft'], 'bounding box format not accepted: {}.'.format(form)
     if form == 'diagonal':      # convert to center format
         boxes = [bbox_diagonal_to_lowerleft(b) for b in boxes]
@@ -42,33 +39,27 @@ def nms_c(boxes, probs, threshold, form='lowerleft'):
     c_len = (ctypes.c_int)(len(keep))
 
 
-    nms.nms_c_src(c_boxes, c_order, c_keep, c_threshold, c_len) # Work should be done in here
+    c_func(c_boxes, c_order, c_keep, c_threshold, c_len) # Work should be done in here
 
 
     keep = [c_keep[i] is 1 for i in range(len(c_keep))]
     return keep
 
 
-# CPU optimized NMS
-def nms_simd(boxes, probs, threshold, form='lowerleft'):
-    assert form in ['center', 'diagonal', 'lowerleft'], 'bounding box format not accepted: {}.'.format(form)
-    if form == 'diagonal':      # convert to center format
-        boxes = [bbox_diagonal_to_lowerleft(b) for b in boxes]
-    if form == 'center':        # convert to lowerleft format
-        boxes = [bbox_center_to_lowerleft(b) for b in boxes]
+# C version of NMS, for benchmarking purposes only
+def nms_c(boxes, probs, threshold, form='lowerleft'):
+    return nms_harness(nms.nms_c_src, boxes, probs, threshold, form='lowerleft')
 
-    nms.nms_simd_src()      # Work should be done in here
-    return
+# OpenMP version of NMS
+def nms_omp(boxes, probs, threshold, form='lowerleft'):
+    return nms_harness(nms.nms_omp_src, boxes, probs, threshold, form='lowerleft')
+    
+
+# SIMD NMS
+def nms_simd(boxes, probs, threshold, form='lowerleft'):
+    return nms_harness(nms.nms_simd_src, boxes, probs, threshold, form='lowerleft')
 
 
 # GPU optimized NMS
 def nms_gpu(boxes, probs, threshold, form='lowerleft'):
-    assert form in ['center', 'diagonal', 'lowerleft'], 'bounding box format not accepted: {}.'.format(form)
-    if form == 'diagonal':      # convert to center format
-        boxes = [bbox_diagonal_to_lowerleft(b) for b in boxes]
-    if form == 'center':        # convert to lowerleft format
-        boxes = [bbox_center_to_lowerleft(b) for b in boxes]
-
-    nms.nms_gpu_src()       # Work should be done in here
-    return
-
+    return nms_harness(nms.nms_gpu_src, boxes, probs, threshold, form='lowerleft')
