@@ -34,6 +34,8 @@ def benchmark(nmsfunc):
     
 if __name__ == "__main__":
     test_correctness(nms_c)
-
-    benchmark(nms_c)
+    test_correctness(nms_omp)
+    
     benchmark(nms_serial)
+    benchmark(nms_c)
+    benchmark(nms_omp)

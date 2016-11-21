@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <immintrin.h>
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
 
@@ -21,7 +22,7 @@ float center_iou(float *box1, float *box2) {
     return 0;
 }
 
-float lowerleft_iou(float *box1, float *box2) {
+float lowerleft_iou(float* restrict box1, float* restrict box2) {
     // determine the (x, y)-coordinates of the intersection rectangle
     float x0 = max(box1[0], box2[0]);
     float y0 = max(box1[1], box2[1]);
@@ -48,25 +49,49 @@ float lowerleft_iou(float *box1, float *box2) {
 
 }
 
-
-/*  Scalar naive implementation of NMS, for benchmarking
-    for i in range(len(order)):
-        if not keep[order[i]]:
-            continue
-        for j in range(i+1, len(order)):
-            if iou(boxes[order[i]], boxes[order[j]]) > threshold:
-                keep[order[j]] = False
-    return keep
+/* 	Scalar naive implementation of NMS, for benchmarking
+	for i in range(len(order)):
+		if not keep[order[i]]:
+		    continue
+		for j in range(i+1, len(order)):
+		    if iou(boxes[order[i]], boxes[order[j]]) > threshold:
+		        keep[order[j]] = False
+	return keep
 */
 void nms_c_src(float *boxes, int *order, int *keep, float threshold, int n) {
-
-    for (int i = 0; i < n; i++) {
-        if (keep[order[i]] == 0) {
+    for(int i=0; i<n; i++) {
+        if(keep[order[i]] == 0) {
             continue;
         }
-        for (int j = i + 1; j < n; j++) {
-            float iou_result = lowerleft_iou(boxes + 4 * order[i], boxes + 4 * order[j]);
-            if (iou_result > threshold) {
+        for(int j=i+1; j<n; j++) {
+            if (keep[order[j]] == 0) {
+                continue;
+            }
+
+            float iou_result = lowerleft_iou(boxes+4*order[i], boxes+4*order[j]);
+            if(iou_result > threshold) {
+                keep[order[j]] = 0;
+            }
+        }
+    }
+
+
+}
+
+/* OpenMP Implementation */
+void nms_omp_src(float *boxes, int *order, int *keep, float threshold, int n) {
+
+
+    for(int i=0; i<n; i++) {
+        if(keep[order[i]] == 0) {
+                continue;
+        }
+
+#pragma omp parallel for
+        for(int j=i+1; j<n; j++) {
+
+            float iou_result = lowerleft_iou(boxes+4*order[i], boxes+4*order[j]);
+            if(iou_result > threshold) {
                 keep[order[j]] = 0;
             }
         }
@@ -198,4 +223,3 @@ void nms_gpu_src(float *h_boxes, int *h_order, int *h_keep, float h_threshold, i
     clReleaseMemObject(g_keep);
     return 0;
 }
-
