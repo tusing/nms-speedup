@@ -1,27 +1,67 @@
 import struct
 def read_binary_file(filename):
-	'''
-	boxes: array of [cx, cy, w, h] (center format)
+        '''
+        boxes: array of [cx, cy, w, h] (center format)
         probs: array of probabilities
-	'''
-	f = open(filename, "rb")
-	x = f.read(4)
+        '''
+        f = open(filename, "rb")
+        x = f.read(4)
         boxes = []
         probs = []
-	while x:
-		num_boxes = struct.unpack('i',x)
-		for i in range(num_boxes[0]):
-			box = []
-			box.append(struct.unpack('f',f.read(4))[0])
-			box.append(struct.unpack('f',f.read(4))[0])
-			box.append(struct.unpack('f',f.read(4))[0])
-			box.append(struct.unpack('f',f.read(4))[0])
-			prob = struct.unpack('f',f.read(4))[0]
-			boxes.append(box)
-			probs.append(prob)
-		x = f.read(4)
+        while x:
+                num_boxes = struct.unpack('i',x)
+                for i in range(num_boxes[0]):
+                        box = []
+                        box.append(struct.unpack('f',f.read(4))[0])
+                        box.append(struct.unpack('f',f.read(4))[0])
+                        box.append(struct.unpack('f',f.read(4))[0])
+                        box.append(struct.unpack('f',f.read(4))[0])
+                        prob = struct.unpack('f',f.read(4))[0]
+                        boxes.append(box)
+                        probs.append(prob)
+                x = f.read(4)
+        f.close()
+        return boxes, probs
 
-	return boxes, probs
+def read_text_file(filename):
+        '''
+         car -1 -1 0.0 175.15 185.65 441.78 334.24 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.980
+          |               |      |      |      |                                  |
+        object          xmin    ymin   xmax   ymax                            confidence
+
+        boxes: array of [xmin, ymin, xmax, ymax]
+        confidences: array of confidence
+        '''
+        f = open(filename, "r")
+        boxes = []
+        confidences = []
+        for line in f:
+                arguments = line.split()
+                boxes.append(map(float, arguments[4:8]))
+                confidences.append(float(arguments[-1]))
+        f.close()
+        return boxes, confidences
+
+def read_text_file_by_object(filename):
+        '''
+         car -1 -1 0.0 175.15 185.65 441.78 334.24 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.980
+          |               |      |      |      |                                  |
+        object          xmin    ymin   xmax   ymax                            confidence
+
+        classes(object)[0]: array of [xmin, ymin, xmax, ymax]
+        classes(object)[1]: array of confidence
+        '''
+        f = open(filename, "r")
+        classes = dict()
+        for line in f:
+                arguments = line.split()
+                object_class = arguments[0]
+                if object_class not in classes:
+                        classes[object_class] = ([], [])
+                classes[object_class][0].append(map(float, arguments[4:8]))
+                classes[object_class][1].append(float(arguments[-1]))
+        f.close()
+        return classes
 
 def flatten(lst):
         if type(lst) is not list:
