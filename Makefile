@@ -1,6 +1,6 @@
 CC = gcc
 
-OPTS = -pthread -O0 -fPIC
+OPTS = -pthread -O3 -fPIC -fopenmp -funroll-loops
 CFLAGS = -Wall -shared -std=gnu99 $(OPTS)
 LFLAGS = -shared -Bsymbolic-functions 
 

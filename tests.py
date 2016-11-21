@@ -88,12 +88,15 @@ def benchmark(nmsfunc):
     
 if __name__ == "__main__":
     test_correctness(nms_c)
-
-    benchmark(nms_c)
+    test_correctness(nms_omp)
+    
     benchmark(nms_serial)
+    benchmark(nms_c)
+    benchmark(nms_omp)
 
     if len(sys.argv) > 1 and "-f" in sys.argv:
         benchmark_full_dataset(nms_c)
 
     if len(sys.argv) > 1 and "-c" in sys.argv:
         test_correctness_car_dataset(nms_c)
+
