@@ -8,7 +8,6 @@
 
 /* GPU implementation of NMS, for benchmarking, Partially sourced from previous homeworks. */
 void nms_gpu_src(float *h_boxes, int *h_order, int *h_keep, float h_threshold, int h_n) {
-
     cl_device_id device_id = NULL;
     cl_context context = NULL;
     cl_command_queue command_queue = NULL;
@@ -65,14 +64,11 @@ void nms_gpu_src(float *h_boxes, int *h_order, int *h_keep, float h_threshold, i
     //CHK_ERR(ret);
 
     /* Copy data from host CPU to GPU */
-    ret = clEnqueueWriteBuffer(command_queue, g_boxes, true, 0, sizeof(float) * n,
-                               h_boxes, 0, NULL, NULL);
+    ret = clEnqueueWriteBuffer(command_queue, g_boxes, true, 0, sizeof(float) * n, h_boxes, 0, NULL, NULL);
     //CHK_ERR(ret);
-    ret = clEnqueueWriteBuffer(command_queue, g_order, true, 0, sizeof(int) * n,
-                               h_order, 0, NULL, NULL);
+    ret = clEnqueueWriteBuffer(command_queue, g_order, true, 0, sizeof(int) * n, h_order, 0, NULL, NULL);
     //CHK_ERR(ret);
-    ret = clEnqueueWriteBuffer(command_queue, g_keep, true, 0, sizeof(int) * n,
-                               h_keep, 0, NULL, NULL);
+    ret = clEnqueueWriteBuffer(command_queue, g_keep, true, 0, sizeof(int) * n, h_keep, 0, NULL, NULL);
     //CHK_ERR(ret);
 
     /* Set OpenCL Kernel Arguments */
@@ -95,23 +91,22 @@ void nms_gpu_src(float *h_boxes, int *h_order, int *h_keep, float h_threshold, i
     /* Call kernel on the GPU */
     ret = clEnqueueNDRangeKernel(command_queue,
                                  nms,
-                                 1,//work_dim,
-                                 NULL, //global_work_offset
-                                 global_work_size, //global_work_size
-                                 local_work_size, //local_work_size
-                                 0, //num_events_in_wait_list
-                                 NULL, //event_wait_list
-                                 NULL //
-                                );
+                                 1,                 //work_dim,
+                                 NULL,              //global_work_offset
+                                 global_work_size,  //global_work_size
+                                 local_work_size,   //local_work_size
+                                 0,                 //num_events_in_wait_list
+                                 NULL,              //event_wait_list
+                                 NULL);
     //CHK_ERR(ret);
 
     /* Read result of GPU on host CPU */
-    ret = clEnqueueReadBuffer(command_queue, g_keep, true, 0, sizeof(float) * n,
-                              h_keep, 0, NULL, NULL);
+    ret = clEnqueueReadBuffer(command_queue, g_keep, true, 0, sizeof(float) * n, h_keep, 0, NULL, NULL);
     //CHK_ERR(ret);
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++) {
         printf("value=%d", h_keep[i]);
+    }
 
 
     /* Shut down the OpenCL runtime */

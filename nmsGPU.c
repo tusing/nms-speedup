@@ -115,9 +115,9 @@ void nms_gpu_src(float *h_boxes, int *h_order, int *h_keep, float h_threshold, i
     ret = clReleaseKernel(nms);
     ret = clReleaseProgram(program);
 
-    delete [] h_boxes;
-    delete [] h_order;
-    delete [] h_keep;
+    free(h_boxes);
+    free(h_order);
+    free(h_keep);
 
     clReleaseMemObject(g_boxes);
     clReleaseMemObject(g_order);
