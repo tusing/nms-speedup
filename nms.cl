@@ -8,7 +8,6 @@ __kernel void nms(__global float *boxes,
     size_t dim = get_local_size(0); // how large is my workgroup?
     size_t idx = get_global_id(0); // where am I in the global index?
 
-    for (int i = 0; i < dim; i++)
-        keep[tid] += 1;
+    keep[idx] = 1;
 }
 
