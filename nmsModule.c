@@ -130,8 +130,6 @@ void nms_omp_src(float *xmins, float* ymins, float* widths, float* heights, int 
             }
         }
     }
-
-
 }
 
 /* Vectorized implementation of NMS, for benchmarking */
@@ -174,106 +172,4 @@ void nms_simd_src(float *xmins, float* ymins, float* widths, float* heights, int
             j ++;
         }
     }
-
-
-
-}
-
-/* GPU implementation of NMS, for benchmarking, Partially sourced from previous homeworks. */
-void nms_gpu_src(float *h_boxes, int *h_order, int *h_keep, float h_threshold, int h_n) {
-    /* std::string nms_kernel_str; */
-
-    /* /\* Provide names of the OpenCL kernels */
-    /*  * and cl file that they're kept in *\/ */
-    /* std::string nms_name_str = */
-    /*     std::string("nms"); */
-    /* std::string nms_kernel_file = */
-    /*     std::string("nms.cl"); */
-
-    /* cl_vars_t cv; */
-    /* cl_kernel nms; */
-
-    /* /\* Read OpenCL file into STL string *\/ */
-    /* readFile(nms_kernel_file, */
-    /*          nms_kernel_str); */
-
-    /* /\* Initialize the OpenCL runtime. *\/ */
-    /* initialize_ocl(cv); */
-
-    /* /\* Compile all OpenCL kernels *\/ */
-    /* compile_ocl_program(nms, cv, nms_kernel_str.c_str(), */
-    /*                     nms_name_str.c_str()); */
-
-    /* /\* Arrays on the host are prefixed with 'h_'. *\/ */
-    /* /\* Arrays on the device (GPU) *\/ */
-    /* cl_mem g_boxes, g_order, g_keep; */
-
-    /* /\* Allocate memory for arrays on the GPU *\/ */
-    /* cl_int err = CL_SUCCESS; */
-
-    /* /\* Create buffers on the GPU. *\/ */
-    /* g_boxes = clCreateBuffer(cv.context, CL_MEM_READ_WRITE, sizeof(float) * n, NULL, &err); */
-    /* CHK_ERR(err); */
-    /* g_order = clCreateBuffer(cv.context, CL_MEM_READ_WRITE, sizeof(int) * n, NULL, &err); */
-    /* CHK_ERR(err); */
-    /* g_keep = clCreateBuffer(cv.context, CL_MEM_READ_WRITE, sizeof(int) * n, NULL, &err); */
-    /* CHK_ERR(err); */
-
-    /* /\* Copy data from host CPU to GPU *\/ */
-    /* err = clEnqueueWriteBuffer(cv.commands, g_boxes, true, 0, sizeof(float) * n, */
-    /*                            h_boxes, 0, NULL, NULL); */
-    /* CHK_ERR(err); */
-    /* err = clEnqueueWriteBuffer(cv.commands, g_order, true, 0, sizeof(int) * n, */
-    /*                            h_order, 0, NULL, NULL); */
-    /* CHK_ERR(err); */
-    /* err = clEnqueueWriteBuffer(cv.commands, g_keep, true, 0, sizeof(int) * n, */
-    /*                            h_keep, 0, NULL, NULL); */
-    /* CHK_ERR(err); */
-
-
-    /* /\* Define the global and local workgroup sizes *\/ */
-    /* size_t global_work_size[1] = {n}; */
-    /* size_t local_work_size[1] = {128}; */
-
-    /* /\* Set Kernel Arguments *\/ */
-    /* err = clSetKernelArg(nms, 0, sizeof(cl_mem), &g_boxes); */
-    /* CHK_ERR(err); */
-    /* err = clSetKernelArg(nms, 1, sizeof(cl_mem), &g_order); */
-    /* CHK_ERR(err); */
-    /* err = clSetKernelArg(nms, 2, sizeof(cl_mem), &g_keep); */
-    /* CHK_ERR(err); */
-    /* err = clSetKernelArg(nms, 3, sizeof(float), &h_threshold); */
-    /* CHK_ERR(err); */
-    /* err = clSetKernelArg(nms, 4, sizeof(int), &h_n); */
-    /* CHK_ERR(err); */
-
-    /* /\* Call kernel on the GPU *\/ */
-    /* err = clEnqueueNDRangeKernel(cv.commands, */
-    /*                              nms, */
-    /*                              1,//work_dim, */
-    /*                              NULL, //global_work_offset */
-    /*                              global_work_size, //global_work_size */
-    /*                              local_work_size, //local_work_size */
-    /*                              0, //num_events_in_wait_list */
-    /*                              NULL, //event_wait_list */
-    /*                              NULL // */
-    /*                             ); */
-    /* CHK_ERR(err); */
-
-    /* /\* Read result of GPU on host CPU *\/ */
-    /* err = clEnqueueReadBuffer(cv.commands, g_keep, true, 0, sizeof(float) * n, */
-    /*                           h_keep, 0, NULL, NULL); */
-    /* CHK_ERR(err); */
-
-    /* /\* Shut down the OpenCL runtime *\/ */
-    /* uninitialize_ocl(cv); */
-
-    /* delete [] h_boxes; */
-    /* delete [] h_order; */
-    /* delete [] h_keep; */
-
-    /* clReleaseMemObject(g_boxes); */
-    /* clReleaseMemObject(g_order); */
-    /* clReleaseMemObject(g_keep); */
-    /* return 0; */
 }

@@ -3,5 +3,11 @@ __kernel void nms(__global float *boxes,
                   __global int *keep,
                   float threshold,
                   int n) {
-    // Implement something here
+    size_t tid = get_local_id(0); // where am I in the workgroup?
+    size_t gid = get_group_id(0); // which workgroup am I in?
+    size_t dim = get_local_size(0); // how large is my workgroup?
+    size_t idx = get_global_id(0); // where am I in the global index?
+
+    keep[idx] = 1;
 }
+
