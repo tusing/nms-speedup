@@ -34,7 +34,7 @@ def test_correctness_car_dataset(nmsfunc):
         testboxes = map(bbox_center_to_diagonal, testboxes)
 
         testprobs = np.asarray(testprobs)
-        testthresholds = [0.0, 0.2, 0.451325, 0.6, 0.8, 1.0]
+        testthresholds = [0.0, 0.2, 0.451325, 0.6, 0.8]
         print("Testing " + filename)
         for testthreshold in testthresholds:
             print("...")
@@ -61,7 +61,7 @@ def benchmark_full_dataset(nmsfunc):
         testboxes = map(bbox_center_to_diagonal, testboxes)
 
         testprobs = np.asarray(testprobs)
-        testthresholds = [0.0, 0.2, 0.451325, 0.6, 0.8, 1.0]
+        testthresholds = [0.0, 0.2, 0.451325, 0.6, 0.8]
 
         starttime = time.time()
         for testthreshold in testthresholds:
@@ -71,6 +71,38 @@ def benchmark_full_dataset(nmsfunc):
         running_avg = (running_avg*(n-1))/n + endtime/n
         print(filename + ": " + str(endtime) + "  Running Average per file: " + str(running_avg))
         total_time += endtime
+    print("Total time: " + str(total_time))
+    print("Average Speed per file: " + str(running_avg))
+
+def benchmark_and_check_accuracy_full_dataset(nmsfunc):
+    path = './data'
+    res_sha = time.strftime("D%d-M%m_h%I-m%M-s%S")
+    res_path = './results/' + res_sha
+    os.mkdir(res_path)
+    res_path = res_path + "/data"
+    os.mkdir(res_path)
+    n = 0
+    total_time = 0
+    running_avg = 0.0
+    testthreshold = 0.2
+    for filename in glob.glob(os.path.join(path, '*.txt')):
+        classes = read_text_file_by_object(filename)
+        endtime = 0
+        f = open(os.path.join(res_path, os.path.basename(filename)), "w")
+        for object_class in classes:
+            testboxes = map(bbox_center_to_diagonal, classes[object_class][0])
+            testprobs = np.asarray(classes[object_class][1])
+            starttime = time.time()
+            keeps = nmsfunc(testboxes, testprobs, testthreshold, "lowerleft")
+            endtime += time.time() - starttime
+            for i in range(len(keeps)):
+                if keeps[i]:
+                    f.write(classes[object_class][2][i])
+        n += 1
+        running_avg = (running_avg*(n-1))/n + endtime/n
+        print(filename + ": " + str(endtime) + "  Running Average per file: " + str(running_avg))
+        total_time += endtime
+        f.close() 
     print("Total time: " + str(total_time))
     print("Average Speed per file: " + str(running_avg))
 
@@ -99,4 +131,6 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1 and "-c" in sys.argv:
         test_correctness_car_dataset(nms_c)
+
+    # benchmark_and_check_accuracy_full_dataset(nms_c)
 

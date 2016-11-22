@@ -57,9 +57,10 @@ def read_text_file_by_object(filename):
                 arguments = line.split()
                 object_class = arguments[0]
                 if object_class not in classes:
-                        classes[object_class] = ([], [])
+                        classes[object_class] = ([], [], [])
                 classes[object_class][0].append(map(float, arguments[4:8]))
                 classes[object_class][1].append(float(arguments[-1]))
+                classes[object_class][2].append(line)
         f.close()
         return classes
 
