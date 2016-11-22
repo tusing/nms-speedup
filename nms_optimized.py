@@ -25,24 +25,38 @@ def nms_harness(c_func, boxes, probs, threshold, form='lowerleft'):
     if form == 'center':        # convert to lowerleft format
         boxes = [bbox_center_to_lowerleft(b) for b in boxes]
 
-    c_boxes = flatten(boxes)
-    c_boxes = (ctypes.c_float * len(c_boxes))(*c_boxes)
+    n = len(boxes)
 
     order = probs.argsort()[::-1].tolist()
-    c_order = (ctypes.c_int * len(order))(*order)
+    c_order = (ctypes.c_int * n)(*order)
 
-    keep = [1] * len(order)
-    c_keep = (ctypes.c_int * len(keep))(*keep)
+
+    boxes = [boxes[order[j]] for j in range(n)]
+
+    c_xmin = [box[0] for box in boxes]
+    c_ymin = [box[1] for box in boxes]
+    c_w = [box[2] for box in boxes]
+    c_h = [box[3] for box in boxes]
+
+    c_xmin = (ctypes.c_float*n)(*c_xmin)
+    c_ymin = (ctypes.c_float*n)(*c_ymin)
+    c_w = (ctypes.c_float*n)(*c_w)
+    c_h = (ctypes.c_float*n)(*c_h)
+
+
+    keep = [1] * n
+    c_keep = (ctypes.c_int * n)(*keep)
 
     c_threshold = (ctypes.c_float)(float(threshold))
 
-    c_len = (ctypes.c_int)(len(keep))
+    c_len = (ctypes.c_int)(n)
 
 
-    c_func(c_boxes, c_order, c_keep, c_threshold, c_len) # Work should be done in here
+    c_func(c_xmin, c_ymin, c_w, c_h, c_order, c_keep, c_threshold, c_len) # Work should be done in here
 
 
-    keep = [c_keep[i] is 1 for i in range(len(c_keep))]
+    for i in range(n):
+        keep[order[i]] = c_keep[i]
     return keep
 
 
@@ -53,7 +67,6 @@ def nms_c(boxes, probs, threshold, form='lowerleft'):
 # OpenMP version of NMS
 def nms_omp(boxes, probs, threshold, form='lowerleft'):
     return nms_harness(nms.nms_omp_src, boxes, probs, threshold, form='lowerleft')
-    
 
 # SIMD NMS
 def nms_simd(boxes, probs, threshold, form='lowerleft'):

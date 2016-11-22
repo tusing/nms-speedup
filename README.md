@@ -11,6 +11,12 @@ Run tests with
 python tests.py
 ~~~~
 
+Run GPU
+~~~~
+g++ -O2 -c nmsGPU.cpp -I/usr/local/cuda-7.5/include
+g++ nmsGPU.o -o nmsGPU -L/usr/local/cuda-7.5/lib64 -lOpenCL
+./nmsGPU
+~~~~~
 Run benchmark with bichen's data
 ~~~~
 python tests.py -f

@@ -14,14 +14,14 @@ def nms_serial(boxes, probs, threshold, form='lowerleft'):
         Returns
             keep:       array of True or False.
     """
-    
+
     assert form in ['center', 'diagonal', 'lowerleft'], 'bounding box format not accepted: {}.'.format(form)
     if form == 'diagonal':      # convert to center format
         boxes = [bbox_diagonal_to_lowerleft(b) for b in boxes]
     if form == 'center':        # convert to lowerleft format
         boxes = [bbox_center_to_lowerleft(b) for b in boxes]
 
-        
+    #print(threshold)
     order = probs.argsort()[::-1]
     keep = [True]*len(order)
 
@@ -29,7 +29,11 @@ def nms_serial(boxes, probs, threshold, form='lowerleft'):
         if not keep[order[i]]:
             continue
         for j in range(i+1, len(order)):
+            if not keep[order[j]]:
+                continue
             iou_result = lowerleft_iou(boxes[order[i]], boxes[order[j]])
+            #print(iou_result, i, j, order[j])
             if iou_result > threshold:
+                #print(iou_result)
                 keep[order[j]] = False
     return keep
