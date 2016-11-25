@@ -54,7 +54,7 @@ def test_correctness_car_dataset(nmsfunc):
     print("No file found in data")
     return False
 
-def benchmark_full_dataset(nmsfunc):
+def benchmark_full_dataset(nmsfunc, max_images=10000000, verbose=False):
     path = './data'
     n = 0
     total_time = 0
@@ -64,18 +64,21 @@ def benchmark_full_dataset(nmsfunc):
         testboxes = map(bbox_center_to_diagonal, testboxes)
 
         testprobs = np.asarray(testprobs)
-        testthresholds = [0.0, 0.2, 0.451325, 0.6, 0.8]
 
-        starttime = time.time()
-        for testthreshold in testthresholds:
-            testkeeps = nmsfunc(testboxes, testprobs, testthreshold, "lowerleft")
-        endtime = time.time() - starttime
+        testthreshold = 0.2
+        # starttime = time.time()
+        testkeeps, endtime = nmsfunc(testboxes, testprobs, testthreshold, "lowerleft", True)
+        # endtime = time.time() - starttime
         n += 1
         running_avg = (running_avg*(n-1))/n + endtime/n
-        print(filename + ": " + str(endtime) + "  Running Average per file: " + str(running_avg))
+        if verbose:
+            print(filename + ": " + str(endtime) + "  Running Average per file: " + str(running_avg))
         total_time += endtime
+        if (n > max_images):
+            break
     print("Total time: " + str(total_time))
     print("Average Speed per file: " + str(running_avg))
+    return (total_time, running_avg)
 
 def benchmark_and_check_accuracy_full_dataset(nmsfunc):
     path = './data'
@@ -121,21 +124,68 @@ def benchmark(nmsfunc):
 
     print(endtime)
 
+def benchmark_multiple(functions, max_images=10000000, verbose=False):
+    results = dict()
+    fastest_function = None
+    fastest_function_time = sys.maxint
+    for function_name in functions:
+        if functions[function_name]:
+            total_time, running_avg = benchmark_full_dataset(functions[function_name], max_images, verbose)
+            results[function_name] = (total_time, running_avg)
+            if running_avg < fastest_function_time:
+                fastest_function_time = running_avg
+                fastest_function = function_name
+    print("")
+    print("-----------------------------------------------------------------")
+    for function_name in results:
+        print(function_name + ": TOTAL TIME=" + str(results[function_name][0]) + " AVERAGE TIME PER IMAGE=" + str(results[function_name][1]))
+    print("Fastest function is " + fastest_function + ".")
+    for function_name in results:
+        if function_name != fastest_function:
+            multiple = "%.3f" % (results[function_name][1]/fastest_function_time)
+            print(fastest_function + " is " + multiple + "x faster than " + function_name + " per image.")
+    print("-----------------------------------------------------------------")
+
+
+nms_functions = dict()
+nms_functions["Serial"] = nms_c
+nms_functions["SIMD"] = nms_simd
+nms_functions["OMP"] = nms_omp
+nms_functions["GPU"] = None
+
+
 if __name__ == "__main__":
-    test_correctness(nms_c)
-    test_correctness(nms_simd)
-    test_correctness(nms_omp)
-
-    benchmark(nms_serial)
-    benchmark(nms_c)
-    benchmark(nms_simd)
-    benchmark(nms_omp)
-
-
-    if len(sys.argv) > 1 and "-f" in sys.argv:
-        benchmark_full_dataset(nms_c)
-
     if len(sys.argv) > 1 and "-c" in sys.argv:
-        test_correctness_car_dataset(nms_c)
+        test_correctness(nms_c)
+        test_correctness(nms_simd)
+        test_correctness(nms_omp)
+
+    # benchmark(nms_serial)
+    # benchmark(nms_c)
+    # benchmark(nms_simd)
+    # benchmark(nms_omp)
+
+
+    if len(sys.argv) > 1 and "-f" in sys.argv or"-fv" in sys.argv:
+        if "-f" in sys.argv:
+            nextElemIndex = sys.argv.index("-f") + 1
+            verbose = False
+        else:
+            nextElemIndex = sys.argv.index("-fv") + 1
+            verbose = True
+        if len(sys.argv) > nextElemIndex:
+            numImages = int(sys.argv[nextElemIndex])
+            if numImages < 0:
+                benchmark_multiple(nms_functions, verbose=verbose)
+            else:
+                benchmark_multiple(nms_functions, max_images=numImages, verbose=verbose)
+        else:
+            print("ERROR -f[v] [number of image]")
+            print("full data benchmark expects an integer argument for the number of images to test, or -1 to test all images")
+        # benchmark_full_dataset(nms_serial, 2)
+
+
+    # if len(sys.argv) > 1 and "-c" in sys.argv:
+    #     test_correctness_car_dataset(nms_c)
 
     # benchmark_and_check_accuracy_full_dataset(nms_c)

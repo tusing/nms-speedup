@@ -2,6 +2,7 @@ import ctypes
 import os
 from utils import *
 from nms_serial import nms_serial
+import time
 
 nms = ctypes.CDLL(os.path.abspath("nms.so"))
 
@@ -18,7 +19,7 @@ nms = ctypes.CDLL(os.path.abspath("nms.so"))
 # Returns:
 #   keep: array of True or False.
 
-def nms_harness(c_func, boxes, probs, threshold, form='lowerleft'):
+def nms_harness(c_func, boxes, probs, threshold, form='lowerleft', benchmarked=False):
     assert form in ['center', 'diagonal', 'lowerleft'], 'bounding box format not accepted: {}.'.format(form)
     if form == 'diagonal':      # convert to center format
         boxes = [bbox_diagonal_to_lowerleft(b) for b in boxes]
@@ -50,29 +51,33 @@ def nms_harness(c_func, boxes, probs, threshold, form='lowerleft'):
     c_threshold = (ctypes.c_float)(float(threshold))
 
     c_len = (ctypes.c_int)(n)
-
-
+    if benchmarked:
+        starttime = time.time()
     c_func(c_xmin, c_ymin, c_w, c_h, c_order, c_keep, c_threshold, c_len) # Work should be done in here
-
+    if benchmarked:
+        elapsed = time.time() - starttime
 
     for i in range(n):
         keep[order[i]] = c_keep[i]
-    return keep
+    if benchmarked:
+        return (keep, elapsed)
+    else:
+        return keep
 
 
 # C version of NMS, for benchmarking purposes only
-def nms_c(boxes, probs, threshold, form='lowerleft'):
-    return nms_harness(nms.nms_c_src, boxes, probs, threshold, form='lowerleft')
+def nms_c(boxes, probs, threshold, form='lowerleft', benchmarked=False):
+    return nms_harness(nms.nms_c_src, boxes, probs, threshold, form, benchmarked)
 
 # OpenMP version of NMS
-def nms_omp(boxes, probs, threshold, form='lowerleft'):
-    return nms_harness(nms.nms_omp_src, boxes, probs, threshold, form='lowerleft')
+def nms_omp(boxes, probs, threshold, form='lowerleft', benchmarked=False):
+    return nms_harness(nms.nms_omp_src, boxes, probs, threshold, form, benchmarked)
 
 # SIMD NMS
-def nms_simd(boxes, probs, threshold, form='lowerleft'):
-    return nms_harness(nms.nms_simd_src, boxes, probs, threshold, form='lowerleft')
+def nms_simd(boxes, probs, threshold, form='lowerleft', benchmarked=False):
+    return nms_harness(nms.nms_simd_src, boxes, probs, threshold, form, benchmarked)
 
 
 # GPU optimized NMS
-def nms_gpu(boxes, probs, threshold, form='lowerleft'):
-    return nms_harness(nms.nms_gpu_src, boxes, probs, threshold, form='lowerleft')
+def nms_gpu(boxes, probs, threshold, form='lowerleft', benchmarked=False):
+    return nms_harness(nms.nms_gpu_src, boxes, probs, threshold, form, benchmarked)
