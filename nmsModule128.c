@@ -135,7 +135,7 @@ void nms_omp_src(float *xmins, float* ymins, float* widths, float* heights, int 
 /* Vectorized implementation of NMS, for benchmarking */
 void nms_simd_src(float *xmins, float* ymins, float* widths, float* heights, int *order, int *keep, float threshold, int n) {
 
-    __m128 t0 = _mm_broadcast_ps((void*) &threshold);
+    __m128 t0 = _mm_broadcast_ss((void*) &threshold);
     int* fmask = (int*)malloc(4*sizeof(int));
 
     for(int i=0; i<n; i++) {
