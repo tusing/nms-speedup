@@ -19,7 +19,8 @@ g++ nmsGPU.o -o nmsGPU -L/usr/local/cuda-7.5/lib64 -lOpenCL
 ~~~~~
 Run benchmark with bichen's data
 ~~~~
-python tests.py -f
+python tests.py -f\[v\] \[number of images\]
+full data benchmark expects an integer argument for the number of images to test, or -1 to test all images
 ~~~~
 
 Run correctness on single file from bichen's data WARNING THIS IS VERY SLOW (>5 minutes)
