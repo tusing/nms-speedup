@@ -1,8 +1,8 @@
-#include <cstring>
-#include <cstdio>
-#include <cstdlib>
-#include <string>
-#include <cmath>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+// #include <string>
+#include <math.h>
 #include <unistd.h>
 #include <CL/cl.h>
 
@@ -115,9 +115,9 @@ void nms_gpu_src(float *h_boxes, int *h_order, int *h_keep, float h_threshold, i
     ret = clReleaseKernel(nms);
     ret = clReleaseProgram(program);
 
-    delete [] h_boxes;
-    delete [] h_order;
-    delete [] h_keep;
+    free(h_boxes);
+    free(h_order);
+    free(h_keep);
 
     clReleaseMemObject(g_boxes);
     clReleaseMemObject(g_order);
