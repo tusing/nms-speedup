@@ -1,10 +1,7 @@
-# Author: Bichen Wu (bichen@berkeley.edu) 08/25/2016
-
-"""Utility functions used in tf-yolo"""
-
 from utils import *
+import time
 
-def nms_serial(boxes, probs, threshold, form='lowerleft'):
+def nms_serial(boxes, probs, threshold, form='lowerleft', benchmarked=False):
     """ Non-Maximum supression.
         Args
             boxes:      array of [cx, cy, w, h] (center format) or [xmin, ymin, xmax, ymax]
@@ -24,7 +21,8 @@ def nms_serial(boxes, probs, threshold, form='lowerleft'):
     #print(threshold)
     order = probs.argsort()[::-1]
     keep = [True]*len(order)
-
+    if benchmarked:
+        starttime = time.time()
     for i in range(len(order)):
         if not keep[order[i]]:
             continue
@@ -36,4 +34,7 @@ def nms_serial(boxes, probs, threshold, form='lowerleft'):
             if iou_result > threshold:
                 #print(iou_result)
                 keep[order[j]] = False
+    if benchmarked:
+        elapsed = time.time() - starttime
+        return (keep, elapsed)
     return keep

@@ -12,7 +12,7 @@ all: clean $(targets)
 
 
 nms.so : nmsModule.c
-	$(CC) $(CFLAGS) $(LFLAGS) $< -o $@
+	$(CC) $(CFLAGS)  $< -o $@ $(LFLAGS)
 
 clean:
 	rm -f *.so *.o

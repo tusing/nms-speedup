@@ -41,20 +41,6 @@ def nms_preprocess(boxes, probs, threshold, form='lowerleft'):
 
     return (c_xmin, c_ymin, c_w, c_h, c_order, c_keep, c_threshold, c_len)
 
-# Include optimized versions of NMS here
-# Args:
-#   boxes: array of [cx, cy, w, h] (center format) or
-#                   [xmin, ymin, xmax, ymax] (diaganol format) or
-#                   [xmin, ymin, w, h] (lowerleft format)
-#   probs: array of probabilities
-#   threshold: two boxes are considered overlapping if their IOU is largher than
-#       this threshold
-#   form: 'center' or 'diagonal'
-# Returns:
-#   keep: array of True or False.
-
-
-
 def nms_harness(c_func, boxes, probs, threshold, form='lowerleft', ordered=False, benchmarked=False):
     assert form in ['center', 'diagonal', 'lowerleft'], 'bounding box format not accepted: {}.'.format(form)
     if form == 'diagonal':      # convert to center format
@@ -122,6 +108,11 @@ def nms_c(boxes, probs, threshold, form='lowerleft', benchmarked=False):
 def nms_omp(boxes, probs, threshold, form='lowerleft', benchmarked=False):
     ordered = True
     return nms_harness(nms.nms_omp_src, boxes, probs, threshold, form, ordered, benchmarked)
+
+# Alternate OpenMP version of NMS
+def nms_omp1(boxes, probs, threshold, form='lowerleft', benchmarked=False):
+    ordered = True
+    return nms_harness(nms.nms_omp1_src, boxes, probs, threshold, form, ordered, benchmarked)
 
 # SIMD NMS
 def nms_simd(boxes, probs, threshold, form='lowerleft', benchmarked=False):
