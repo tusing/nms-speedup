@@ -119,7 +119,6 @@ def nms_simd(boxes, probs, threshold, form='lowerleft', benchmarked=False):
     ordered = True
     return nms_harness(nms.nms_simd_src, boxes, probs, threshold, form, ordered, benchmarked)
 
-
 # GPU optimized NMS
 def nms_gpu(boxes, probs, threshold, form='lowerleft', ordered=True, benchmarked=False):
     return nms_harness(nms.nms_gpu_src, boxes, probs, threshold, form, ordered, benchmarked)

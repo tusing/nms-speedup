@@ -155,7 +155,7 @@ nms_functions["Serial_Unordered"] = nms_c_unsorted_src
 nms_functions["SIMD"] = nms_simd
 nms_functions["OMP"] = nms_omp
 nms_functions["OMP_alternate"] = nms_omp1
-nms_functions["GPU"] = None
+nms_functions["GPU"] = nms_gpu
 
 
 if __name__ == "__main__":
@@ -170,6 +170,8 @@ if __name__ == "__main__":
         test_correctness(nms_omp)
         print("c_omp1")
         test_correctness(nms_omp1)
+        print("gpu")
+        test_correctness(nms_gpu)
 
     # benchmark(nms_serial)
     # benchmark(nms_c)

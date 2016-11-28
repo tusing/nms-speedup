@@ -203,7 +203,7 @@ void nms_simd_src(float *xmins, float *ymins, float* widths, float* heights, int
 }
 
 /* GPU implementation of NMS, for benchmarking, Partially sourced from previous homeworks. */
-void nms_gpu_src(float *h_xmins, int *h_ymins, int *h_widths, float h_heights, int *h_order, int *h_keep, float h_threshold, int h_n, int *h_probs) {
+void nms_gpu_src(float *h_xmins, float *h_ymins, float *h_widths, float *h_heights, int *h_order, int *h_keep, float h_threshold, int h_n, int *h_probs) {
 
     cl_device_id device_id = NULL;
     cl_context context = NULL;
@@ -220,7 +220,7 @@ void nms_gpu_src(float *h_xmins, int *h_ymins, int *h_widths, float h_heights, i
     char *source_str;
     size_t source_size;
 
-    int n = (1 << 12);
+    int n = h_n;
 
     /* Load the source code containing the kernel */
     fp = fopen(fileName, "r");
@@ -252,17 +252,34 @@ void nms_gpu_src(float *h_xmins, int *h_ymins, int *h_widths, float h_heights, i
 
 
     /* Create Memory Buffer */
-    cl_mem g_xmins, g_ymins, g_keep;
-    g_boxes = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * n, NULL, &ret);
+    cl_mem g_xmins, g_ymins, g_widths, g_heights, g_order, g_keep, g_probs;
+    g_xmins = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * n, NULL, &ret);
+    //CHK_ERR(ret);
+    g_ymins = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * n, NULL, &ret);
+    //CHK_ERR(ret);
+    g_widths = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * n, NULL, &ret);
+    //CHK_ERR(ret);
+    g_heights = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * n, NULL, &ret);
     //CHK_ERR(ret);
     g_order = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int) * n, NULL, &ret);
     //CHK_ERR(ret);
     g_keep = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int) * n, NULL, &ret);
     //CHK_ERR(ret);
+    g_probs = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int) * n, NULL, &ret);
+    //CHK_ERR(ret);
 
     /* Copy data from host CPU to GPU */
-    ret = clEnqueueWriteBuffer(command_queue, g_boxes, 1, 0, sizeof(float) * n,
-                               h_boxes, 0, NULL, NULL);
+    ret = clEnqueueWriteBuffer(command_queue, g_xmins, 1, 0, sizeof(float) * n,
+                               h_xmins, 0, NULL, NULL);
+    //CHK_ERR(ret);
+    ret = clEnqueueWriteBuffer(command_queue, g_ymins, 1, 0, sizeof(float) * n,
+                               h_ymins, 0, NULL, NULL);
+    //CHK_ERR(ret);
+    ret = clEnqueueWriteBuffer(command_queue, g_widths, 1, 0, sizeof(float) * n,
+                               h_widths, 0, NULL, NULL);
+    //CHK_ERR(ret);
+    ret = clEnqueueWriteBuffer(command_queue, g_heights, 1, 0, sizeof(float) * n,
+                               h_heights, 0, NULL, NULL);
     //CHK_ERR(ret);
     ret = clEnqueueWriteBuffer(command_queue, g_order, 1, 0, sizeof(int) * n,
                                h_order, 0, NULL, NULL);
@@ -270,22 +287,33 @@ void nms_gpu_src(float *h_xmins, int *h_ymins, int *h_widths, float h_heights, i
     ret = clEnqueueWriteBuffer(command_queue, g_keep, 1, 0, sizeof(int) * n,
                                h_keep, 0, NULL, NULL);
     //CHK_ERR(ret);
+    ret = clEnqueueWriteBuffer(command_queue, g_probs, 1, 0, sizeof(int) * n,
+                               h_probs, 0, NULL, NULL);
+    //CHK_ERR(ret);
 
     /* Set OpenCL Kernel Arguments */
-    ret = clSetKernelArg(nms, 0, sizeof(cl_mem), &g_boxes);
+    ret = clSetKernelArg(nms, 0, sizeof(cl_mem), &g_xmins);
     //CHK_ERR(ret);
-    ret = clSetKernelArg(nms, 1, sizeof(cl_mem), &g_order);
+    ret = clSetKernelArg(nms, 1, sizeof(cl_mem), &g_ymins);
     //CHK_ERR(ret);
-    ret = clSetKernelArg(nms, 2, sizeof(cl_mem), &g_keep);
+    ret = clSetKernelArg(nms, 2, sizeof(cl_mem), &g_widths);
     //CHK_ERR(ret);
-    ret = clSetKernelArg(nms, 3, sizeof(float), &h_threshold);
+    ret = clSetKernelArg(nms, 3, sizeof(cl_mem), &g_heights);
     //CHK_ERR(ret);
-    ret = clSetKernelArg(nms, 4, sizeof(int), &h_n);
+    ret = clSetKernelArg(nms, 4, sizeof(cl_mem), &g_order);
+    //CHK_ERR(ret);
+    ret = clSetKernelArg(nms, 5, sizeof(cl_mem), &g_keep);
+    //CHK_ERR(ret);
+    ret = clSetKernelArg(nms, 6, sizeof(float), &h_threshold);
+    //CHK_ERR(ret);
+    ret = clSetKernelArg(nms, 7, sizeof(int), &h_n);
+    //CHK_ERR(ret);
+    ret = clSetKernelArg(nms, 8, sizeof(cl_mem), &g_probs);
     //CHK_ERR(ret);
 
     /* Define the global and local workgroup sizes */
     size_t global_work_size[1] = {n};
-    size_t local_work_size[1] = {128};
+    size_t local_work_size[1] = {512};
 
 
     /* Call kernel on the GPU */
@@ -316,13 +344,17 @@ void nms_gpu_src(float *h_xmins, int *h_ymins, int *h_widths, float h_heights, i
     ret = clReleaseKernel(nms);
     ret = clReleaseProgram(program);
 
-    free(h_boxes);
-    free(h_order);
-    free(h_keep);
+    //free(h_boxes);
+    //free(h_order);
+    //free(h_keep);
 
-    clReleaseMemObject(g_boxes);
+    clReleaseMemObject(g_xmins);
+    clReleaseMemObject(g_ymins);
+    clReleaseMemObject(g_widths);
+    clReleaseMemObject(g_heights);
     clReleaseMemObject(g_order);
     clReleaseMemObject(g_keep);
+    clReleaseMemObject(g_probs);
     clReleaseCommandQueue(command_queue);
     clReleaseContext(context);
 }
