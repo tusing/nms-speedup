@@ -149,6 +149,7 @@ def benchmark_multiple(functions, max_images=10000000, verbose=False):
 
 nms_functions = dict()
 nms_functions["Serial"] = nms_c
+nms_functions["Serial_Unordered"] = nms_c_unsorted_src
 nms_functions["SIMD"] = nms_simd
 nms_functions["OMP"] = nms_omp
 nms_functions["GPU"] = None
@@ -156,6 +157,7 @@ nms_functions["GPU"] = None
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and "-c" in sys.argv:
+        test_correctness(nms_c_unsorted_src)
         test_correctness(nms_c)
         test_correctness(nms_simd)
         test_correctness(nms_omp)
