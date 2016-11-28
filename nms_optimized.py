@@ -73,6 +73,10 @@ def nms_c(boxes, probs, threshold, form='lowerleft', benchmarked=False):
 def nms_omp(boxes, probs, threshold, form='lowerleft', benchmarked=False):
     return nms_harness(nms.nms_omp_src, boxes, probs, threshold, form, benchmarked)
 
+# Alternate OpenMP version of NMS
+def nms_omp1(boxes, probs, threshold, form='lowerleft', benchmarked=False):
+    return nms_harness(nms.nms_omp1_src, boxes, probs, threshold, form, benchmarked)
+
 # SIMD NMS
 def nms_simd(boxes, probs, threshold, form='lowerleft', benchmarked=False):
     return nms_harness(nms.nms_simd_src, boxes, probs, threshold, form, benchmarked)

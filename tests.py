@@ -18,12 +18,11 @@ def test_correctness(nmsfunc):
     for testthreshold in testthresholds:
         correctkeeps = nms_serial(testboxes, testprobs, testthreshold, "lowerleft")
         testkeeps = nmsfunc(testboxes, testprobs, testthreshold, "lowerleft")
-        #print(errors)
 
         for i in range(len(correctkeeps)):
             if correctkeeps[i] != testkeeps[i]:
                 errors += 1.0
-    print("{}% error rate".format(str(100 * errors /(len(testboxes) * len(testthresholds)))))
+    print("{}% error rate, {} errors".format(str(100 * errors /(len(testboxes) * len(testthresholds))), errors))
     return True
 
 def test_correctness_car_dataset(nmsfunc):
@@ -112,22 +111,22 @@ def benchmark_and_check_accuracy_full_dataset(nmsfunc):
     print("Total time: " + str(total_time))
     print("Average Speed per file: " + str(running_avg))
 
-def benchmark(nmsfunc):
-    testboxes, testprobs = read_binary_file("dataset/boxes.dat")
-    testprobs = np.asarray(testprobs)
-    testthresholds = [random.random() for i in range(20)]
+# def benchmark(nmsfunc):
+#     testboxes, testprobs = read_binary_file("dataset/boxes.dat")
+#     testprobs = np.asarray(testprobs)
+#     testthresholds = [random.random() for i in range(20)]
 
-    starttime = time.time()
-    for testthreshold in testthresholds:
-        testkeeps = nmsfunc(testboxes, testprobs, testthreshold, "lowerleft")
-    endtime = time.time() - starttime
+#     starttime = time.time()
+#     for testthreshold in testthresholds:
+#         testkeeps = nmsfunc(testboxes, testprobs, testthreshold, "lowerleft")
+#     endtime = time.time() - starttime
 
-    print(endtime)
+#     print(endtime)
 
 def benchmark_multiple(functions, max_images=10000000, verbose=False):
     results = dict()
     fastest_function = None
-    fastest_function_time = sys.maxint
+    fastest_function_time = sys.maxsize
     for function_name in functions:
         if functions[function_name]:
             total_time, running_avg = benchmark_full_dataset(functions[function_name], max_images, verbose)
@@ -148,9 +147,11 @@ def benchmark_multiple(functions, max_images=10000000, verbose=False):
 
 
 nms_functions = dict()
-nms_functions["Serial"] = nms_c
+nms_functions["Serial_c"] = nms_c
+nms_functions["Serial_py"] = nms_serial
 nms_functions["SIMD"] = nms_simd
 nms_functions["OMP"] = nms_omp
+nms_functions["OMP_alternate"] = nms_omp1
 nms_functions["GPU"] = None
 
 
@@ -159,6 +160,7 @@ if __name__ == "__main__":
         test_correctness(nms_c)
         test_correctness(nms_simd)
         test_correctness(nms_omp)
+        test_correctness(nms_omp1)
 
     # benchmark(nms_serial)
     # benchmark(nms_c)
