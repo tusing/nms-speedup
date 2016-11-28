@@ -34,7 +34,7 @@ __kernel void nms(__global float *xmins, __global float *ymins, __global float *
     size_t idx = get_global_id(0);	// where am I in the global index?
 
     for (int j = idx + 1; j < n; j++) {
-        float iou_result = lowerleft_iou(xmins, ymins, widths, heights, i, j);
+        float iou_result = lowerleft_iou(xmins, ymins, widths, heights, idx, j);
         if (iou_result > threshold) {
             keep[j] = 0;
         }

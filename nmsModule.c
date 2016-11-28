@@ -203,7 +203,7 @@ void nms_simd_src(float *xmins, float *ymins, float* widths, float* heights, int
 }
 
 /* GPU implementation of NMS, for benchmarking, Partially sourced from previous homeworks. */
-void nms_gpu_src(float *h_xmins, float *h_ymins, float *h_widths, float *h_heights, int *h_order, int *h_keep, float h_threshold, int h_n, int *h_probs) {
+void nms_gpu_src(float *xmins, float *ymins, float *widths, float *heights, int *order, int *keep, float threshold, int n, int *probs) {
 
     cl_device_id device_id = NULL;
     cl_context context = NULL;
@@ -215,12 +215,11 @@ void nms_gpu_src(float *h_xmins, float *h_ymins, float *h_widths, float *h_heigh
     cl_uint ret_num_platforms;
     cl_int ret;
 
+
     FILE *fp;
     char fileName[] = "./nms.cl";
     char *source_str;
     size_t source_size;
-
-    int n = h_n;
 
     /* Load the source code containing the kernel */
     fp = fopen(fileName, "r");
@@ -270,25 +269,25 @@ void nms_gpu_src(float *h_xmins, float *h_ymins, float *h_widths, float *h_heigh
 
     /* Copy data from host CPU to GPU */
     ret = clEnqueueWriteBuffer(command_queue, g_xmins, 1, 0, sizeof(float) * n,
-                               h_xmins, 0, NULL, NULL);
+                               xmins, 0, NULL, NULL);
     //CHK_ERR(ret);
     ret = clEnqueueWriteBuffer(command_queue, g_ymins, 1, 0, sizeof(float) * n,
-                               h_ymins, 0, NULL, NULL);
+                               ymins, 0, NULL, NULL);
     //CHK_ERR(ret);
     ret = clEnqueueWriteBuffer(command_queue, g_widths, 1, 0, sizeof(float) * n,
-                               h_widths, 0, NULL, NULL);
+                               widths, 0, NULL, NULL);
     //CHK_ERR(ret);
     ret = clEnqueueWriteBuffer(command_queue, g_heights, 1, 0, sizeof(float) * n,
-                               h_heights, 0, NULL, NULL);
+                               heights, 0, NULL, NULL);
     //CHK_ERR(ret);
     ret = clEnqueueWriteBuffer(command_queue, g_order, 1, 0, sizeof(int) * n,
-                               h_order, 0, NULL, NULL);
+                               order, 0, NULL, NULL);
     //CHK_ERR(ret);
     ret = clEnqueueWriteBuffer(command_queue, g_keep, 1, 0, sizeof(int) * n,
-                               h_keep, 0, NULL, NULL);
+                               keep, 0, NULL, NULL);
     //CHK_ERR(ret);
     ret = clEnqueueWriteBuffer(command_queue, g_probs, 1, 0, sizeof(int) * n,
-                               h_probs, 0, NULL, NULL);
+                               probs, 0, NULL, NULL);
     //CHK_ERR(ret);
 
     /* Set OpenCL Kernel Arguments */
@@ -304,9 +303,9 @@ void nms_gpu_src(float *h_xmins, float *h_ymins, float *h_widths, float *h_heigh
     //CHK_ERR(ret);
     ret = clSetKernelArg(nms, 5, sizeof(cl_mem), &g_keep);
     //CHK_ERR(ret);
-    ret = clSetKernelArg(nms, 6, sizeof(float), &h_threshold);
+    ret = clSetKernelArg(nms, 6, sizeof(float), &threshold);
     //CHK_ERR(ret);
-    ret = clSetKernelArg(nms, 7, sizeof(int), &h_n);
+    ret = clSetKernelArg(nms, 7, sizeof(int), &n);
     //CHK_ERR(ret);
     ret = clSetKernelArg(nms, 8, sizeof(cl_mem), &g_probs);
     //CHK_ERR(ret);
@@ -331,12 +330,11 @@ void nms_gpu_src(float *h_xmins, float *h_ymins, float *h_widths, float *h_heigh
 
     /* Read result of GPU on host CPU */
     ret = clEnqueueReadBuffer(command_queue, g_keep, 1, 0, sizeof(float) * n,
-                              h_keep, 0, NULL, NULL);
+                              keep, 0, NULL, NULL);
     //CHK_ERR(ret);
 
-    for (int i = 0; i < n; i++)
-        printf("value=%d", h_keep[i]);
-
+    //for (int i = 0; i < n; i++)
+    //    printf("value:%d", keep[i]);
 
     /* Shut down the OpenCL runtime */
     ret = clFlush(command_queue);
