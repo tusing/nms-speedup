@@ -203,7 +203,7 @@ void nms_simd_src(float *xmins, float *ymins, float* widths, float* heights, int
 }
 
 /* GPU implementation of NMS, for benchmarking, Partially sourced from previous homeworks. */
-void nms_gpu_src(float *h_boxes, int *h_order, int *h_keep, float h_threshold, int h_n) {
+void nms_gpu_src(float *h_xmins, int *h_ymins, int *h_widths, float h_heights, int *h_order, int *h_keep, float h_threshold, int h_n, int *h_probs) {
 
     cl_device_id device_id = NULL;
     cl_context context = NULL;
@@ -252,7 +252,7 @@ void nms_gpu_src(float *h_boxes, int *h_order, int *h_keep, float h_threshold, i
 
 
     /* Create Memory Buffer */
-    cl_mem g_boxes, g_order, g_keep;
+    cl_mem g_xmins, g_ymins, g_keep;
     g_boxes = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * n, NULL, &ret);
     //CHK_ERR(ret);
     g_order = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int) * n, NULL, &ret);
