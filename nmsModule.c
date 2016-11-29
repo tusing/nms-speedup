@@ -10,135 +10,157 @@
 #define max(a,b) (((a)>(b))?(a):(b))
 
 void reportOCLError(cl_int err, char* string);
-
 static char string[100];
-
 void CHK_ERR(cl_int err, int line);
 
 void CHK_ERR(cl_int err, int line) {
-  if(err != CL_SUCCESS) {
-    reportOCLError(err, string);
-    printf("Error: %s, File: %s, Line: %d\n", string, __FILE__, line);
-    exit(-1);
-  }
+    if(err != CL_SUCCESS) {
+        reportOCLError(err, string);
+        printf("Error: %s, File: %s, Line: %d\n", string, __FILE__, line);
+        exit(-1);
+    }
 }
 
-void reportOCLError(cl_int err, char* string)
-{
-  switch (err) 
-    {
-    case CL_DEVICE_NOT_FOUND:          
-      strcpy(string, "Device not found.");
-      break;
-    case CL_DEVICE_NOT_AVAILABLE:           
-      strcpy(string, "Device not available");
-      break;
-    case CL_COMPILER_NOT_AVAILABLE:     
-      strcpy(string, "Compiler not available");
-      break;
-    case CL_MEM_OBJECT_ALLOCATION_FAILURE:   
-      strcpy(string, "Memory object allocation failure");
-      break;
-    case CL_OUT_OF_RESOURCES:       
-      strcpy(string, "Out of resources");
-      break;
-    case CL_OUT_OF_HOST_MEMORY:     
-      strcpy(string, "Out of host memory");
-      break;
-    case CL_PROFILING_INFO_NOT_AVAILABLE:  
-      strcpy(string, "Profiling information not available");
-      break;
-    case CL_MEM_COPY_OVERLAP:        
-      strcpy(string, "Memory copy overlap");
-      break;
-    case CL_IMAGE_FORMAT_MISMATCH:   
-      strcpy(string, "Image format mismatch");
-      break;
-    case CL_IMAGE_FORMAT_NOT_SUPPORTED:         
-      strcpy(string, "Image format not supported");    break;
-    case CL_BUILD_PROGRAM_FAILURE:     
-      strcpy(string, "Program build failure");    break;
-    case CL_MAP_FAILURE:         
-      strcpy(string, "Map failure");    break;
-    case CL_INVALID_VALUE:
-      strcpy(string, "Invalid value");    break;
-    case CL_INVALID_DEVICE_TYPE:
-      strcpy(string, "Invalid device type");    break;
-    case CL_INVALID_PLATFORM:        
-      strcpy(string, "Invalid platform");    break;
-    case CL_INVALID_DEVICE:     
-      strcpy(string, "Invalid device");    break;
-    case CL_INVALID_CONTEXT:        
-      strcpy(string, "Invalid context");    break;
-    case CL_INVALID_QUEUE_PROPERTIES: 
-      strcpy(string, "Invalid queue properties");    break;
-    case CL_INVALID_COMMAND_QUEUE:          
-      strcpy(string, "Invalid command queue");    break;
-    case CL_INVALID_HOST_PTR:            
-      strcpy(string, "Invalid host pointer");    break;
-    case CL_INVALID_MEM_OBJECT:              
-      strcpy(string, "Invalid memory object");    break;
-    case CL_INVALID_IMAGE_FORMAT_DESCRIPTOR:  
-      strcpy(string, "Invalid image format descriptor");    break;
-    case CL_INVALID_IMAGE_SIZE:           
-      strcpy(string, "Invalid image size");    break;
-    case CL_INVALID_SAMPLER:     
-      strcpy(string, "Invalid sampler");    break;
-    case CL_INVALID_BINARY:                    
-      strcpy(string, "Invalid binary");    break;
-    case CL_INVALID_BUILD_OPTIONS:           
-      strcpy(string, "Invalid build options");    break;
-    case CL_INVALID_PROGRAM:               
-      strcpy(string, "Invalid program");
-    case CL_INVALID_PROGRAM_EXECUTABLE:  
-      strcpy(string, "Invalid program executable");    break;
-    case CL_INVALID_KERNEL_NAME:         
-      strcpy(string, "Invalid kernel name");    break;
-    case CL_INVALID_KERNEL_DEFINITION:      
-      strcpy(string, "Invalid kernel definition");    break;
-    case CL_INVALID_KERNEL:               
-      strcpy(string, "Invalid kernel");    break;
-    case CL_INVALID_ARG_INDEX:           
-      strcpy(string, "Invalid argument index");    break;
-    case CL_INVALID_ARG_VALUE:               
-      strcpy(string, "Invalid argument value");    break;
-    case CL_INVALID_ARG_SIZE:              
-      strcpy(string, "Invalid argument size");    break;
-    case CL_INVALID_KERNEL_ARGS:           
-      strcpy(string, "Invalid kernel arguments");    break;
-    case CL_INVALID_WORK_DIMENSION:       
-      strcpy(string, "Invalid work dimension");    break;
-      break;
-    case CL_INVALID_WORK_GROUP_SIZE:          
-      strcpy(string, "Invalid work group size");    break;
-      break;
-    case CL_INVALID_WORK_ITEM_SIZE:      
-      strcpy(string, "Invalid work item size");    break;
-      break;
-    case CL_INVALID_GLOBAL_OFFSET: 
-      strcpy(string, "Invalid global offset");    break;
-      break;
-    case CL_INVALID_EVENT_WAIT_LIST: 
-      strcpy(string, "Invalid event wait list");    break;
-      break;
-    case CL_INVALID_EVENT:                
-      strcpy(string, "Invalid event");    break;
-      break;
-    case CL_INVALID_OPERATION:       
-      strcpy(string, "Invalid operation");    break;
-      break;
-    case CL_INVALID_GL_OBJECT:              
-      strcpy(string, "Invalid OpenGL object");    break;
-      break;
-    case CL_INVALID_BUFFER_SIZE:          
-      strcpy(string, "Invalid buffer size");    break;
-      break;
-    case CL_INVALID_MIP_LEVEL:             
-      strcpy(string, "Invalid mip-map level");   
-      break;  
-    default: 
-      strcpy(string, "Unknown");
-      break;
+void reportOCLError(cl_int err, char* string) {
+    switch (err) {
+        case CL_DEVICE_NOT_FOUND:
+            strcpy(string, "Device not found.");
+            break;
+        case CL_DEVICE_NOT_AVAILABLE:
+            strcpy(string, "Device not available");
+            break;
+        case CL_COMPILER_NOT_AVAILABLE:     
+            strcpy(string, "Compiler not available");
+            break;
+        case CL_MEM_OBJECT_ALLOCATION_FAILURE:
+            strcpy(string, "Memory object allocation failure");
+            break;
+        case CL_OUT_OF_RESOURCES:
+            strcpy(string, "Out of resources");
+            break;
+        case CL_OUT_OF_HOST_MEMORY:
+            strcpy(string, "Out of host memory");
+            break;
+        case CL_PROFILING_INFO_NOT_AVAILABLE:
+            strcpy(string, "Profiling information not available");
+            break;
+        case CL_MEM_COPY_OVERLAP:
+            strcpy(string, "Memory copy overlap");
+            break;
+        case CL_IMAGE_FORMAT_MISMATCH:
+            strcpy(string, "Image format mismatch");
+            break;
+        case CL_IMAGE_FORMAT_NOT_SUPPORTED:
+            strcpy(string, "Image format not supported");
+            break;
+        case CL_BUILD_PROGRAM_FAILURE:     
+            strcpy(string, "Program build failure");
+            break;
+        case CL_MAP_FAILURE:         
+            strcpy(string, "Map failure");
+            break;
+        case CL_INVALID_VALUE:
+            strcpy(string, "Invalid value");
+            break;
+        case CL_INVALID_DEVICE_TYPE:
+            strcpy(string, "Invalid device type");
+            break;
+        case CL_INVALID_PLATFORM:        
+            strcpy(string, "Invalid platform");
+            break;
+        case CL_INVALID_DEVICE:     
+            strcpy(string, "Invalid device");
+            break;
+        case CL_INVALID_CONTEXT:        
+            strcpy(string, "Invalid context");
+            break;
+        case CL_INVALID_QUEUE_PROPERTIES: 
+            strcpy(string, "Invalid queue properties");
+            break;
+        case CL_INVALID_COMMAND_QUEUE:          
+            strcpy(string, "Invalid command queue");
+            break;
+        case CL_INVALID_HOST_PTR:            
+            strcpy(string, "Invalid host pointer");
+            break;
+        case CL_INVALID_MEM_OBJECT:              
+            strcpy(string, "Invalid memory object");
+            break;
+        case CL_INVALID_IMAGE_FORMAT_DESCRIPTOR:  
+            strcpy(string, "Invalid image format descriptor");
+            break;
+        case CL_INVALID_IMAGE_SIZE:           
+            strcpy(string, "Invalid image size");
+            break;
+        case CL_INVALID_SAMPLER:     
+            strcpy(string, "Invalid sampler");
+            break;
+        case CL_INVALID_BINARY:                    
+            strcpy(string, "Invalid binary");
+            break;
+        case CL_INVALID_BUILD_OPTIONS:           
+            strcpy(string, "Invalid build options");
+            break;
+        case CL_INVALID_PROGRAM:               
+            strcpy(string, "Invalid program");
+            break;
+        case CL_INVALID_PROGRAM_EXECUTABLE:  
+            strcpy(string, "Invalid program executable");
+            break;
+        case CL_INVALID_KERNEL_NAME:         
+            strcpy(string, "Invalid kernel name");
+            break;
+        case CL_INVALID_KERNEL_DEFINITION:      
+            strcpy(string, "Invalid kernel definition");
+            break;
+        case CL_INVALID_KERNEL:               
+            strcpy(string, "Invalid kernel");
+            break;
+        case CL_INVALID_ARG_INDEX:           
+            strcpy(string, "Invalid argument index");
+            break;
+        case CL_INVALID_ARG_VALUE:               
+            strcpy(string, "Invalid argument value");
+            break;
+        case CL_INVALID_ARG_SIZE:              
+            strcpy(string, "Invalid argument size");
+            break;
+        case CL_INVALID_KERNEL_ARGS:           
+            strcpy(string, "Invalid kernel arguments");
+            break;
+        case CL_INVALID_WORK_DIMENSION:       
+            strcpy(string, "Invalid work dimension");
+            break;
+        case CL_INVALID_WORK_GROUP_SIZE:          
+            strcpy(string, "Invalid work group size");
+            break;
+        case CL_INVALID_WORK_ITEM_SIZE:      
+            strcpy(string, "Invalid work item size");
+            break;
+        case CL_INVALID_GLOBAL_OFFSET: 
+            strcpy(string, "Invalid global offset");
+            break;
+        case CL_INVALID_EVENT_WAIT_LIST: 
+            strcpy(string, "Invalid event wait list");
+            break;
+        case CL_INVALID_EVENT:                
+            strcpy(string, "Invalid event");
+            break;
+        case CL_INVALID_OPERATION:       
+            strcpy(string, "Invalid operation");
+            break;
+        case CL_INVALID_GL_OBJECT:              
+            strcpy(string, "Invalid OpenGL object");
+            break;
+        case CL_INVALID_BUFFER_SIZE:          
+            strcpy(string, "Invalid buffer size");
+            break;
+        case CL_INVALID_MIP_LEVEL:
+            strcpy(string, "Invalid mip-map level");   
+            break;
+        default:
+            strcpy(string, "Unknown");
+            break;
     }
  }
 
@@ -203,37 +225,10 @@ __m256 simd_lowerleft_iou(float* restrict xmins, float* restrict ymins, float* w
     __m256 retval = _mm256_setzero_ps();
     mask = _mm256_cmp_ps(tot_area, t0, 2);
     retval = _mm256_blendv_ps(t3, retval, mask);
+
     return retval;
-
 }
 
-void nms_c_unsorted_src(float *xmins, float *ymins, float* widths, float* heights, int *order, int *keep, float threshold, int n, float *probs) {
-    #pragma omp parallel for
-    for(int i=0; i<n; i++) {
-        if(keep[i] == 0) {
-            continue;
-        }
-        for(int j=i+1; j<n; j++) {
-            if (keep[j] == 0) {
-                continue;
-            }
-            float iou_result = lowerleft_iou(xmins, ymins, widths, heights, i, j);
-            //printf("%f\t%d\t%d\t%d\n", iou_result, i, j, order[j]);
-            if(iou_result > threshold) {
-                if (probs[i] > probs[j]) {
-                    keep[j] = 0;
-                } else {
-                    keep[i] = 0;
-                    break;
-                }
-                //printf("%f\n", iou_result);
-                // keep[j] = 0;
-            }
-        }
-    }
-
-
-}
 /* 	Scalar naive implementation of NMS, for benchmarking
 	for i in range(len(order)):
 		if not keep[order[i]]:
@@ -259,7 +254,6 @@ void nms_c_src(float *xmins, float *ymins, float* widths, float* heights, int *o
 
 /* OpenMP Implementation */
 void nms_omp_src(float *xmins, float *ymins, float* widths, float* heights, int *order, int *keep, float threshold, int n, float *probs) {
-
     for(int i=0; i<n; i++) {
         if(keep[i] == 0) {
             continue;
@@ -291,10 +285,32 @@ void nms_omp1_src(float *xmins, float* ymins, float* widths, float* heights, int
     }
 }
 
+/* parallel C implementation, without probability sorting */
+void nms_c_unsorted_src(float *xmins, float *ymins, float* widths, float* heights, int *order, int *keep, float threshold, int n, float *probs) {
+    #pragma omp parallel for
+    for(int i=0; i<n; i++) {
+        if(keep[i] == 0) {
+            continue;
+        }
+        for(int j=i+1; j<n; j++) {
+            if (keep[j] == 0) {
+                continue;
+            }
+            float iou_result = lowerleft_iou(xmins, ymins, widths, heights, i, j);
+            if(iou_result > threshold) {
+                if (probs[i] > probs[j]) {
+                    keep[j] = 0;
+                } else {
+                    keep[i] = 0;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 /* Vectorized implementation of NMS, for benchmarking */
 void nms_simd_src(float *xmins, float *ymins, float* widths, float* heights, int *order, int *keep, float threshold, int n, float *probs) {
-
-/* #pragma omp parallel for schedule(dynamic, 1) firstprivate(xmins, ymins, widths, heights, order, keep, threshold, n, probs) */
     for(int i=0; i<n; i++) {
         if(keep[i] == 0) {
             continue;
@@ -322,7 +338,6 @@ void nms_simd_src(float *xmins, float *ymins, float* widths, float* heights, int
 
 /* GPU implementation of NMS, for benchmarking, Partially sourced from previous homeworks. */
 void nms_gpu_src(float *xmins, float *ymins, float *widths, float *heights, int *order, int *keep, float threshold, int n, float *probs) {
-
     cl_device_id device_id = NULL;
     cl_context context = NULL;
     cl_command_queue command_queue = NULL;
@@ -332,7 +347,6 @@ void nms_gpu_src(float *xmins, float *ymins, float *widths, float *heights, int 
     cl_uint ret_num_devices;
     cl_uint ret_num_platforms;
     cl_int ret;
-    printf("HERE1\n");
 
     FILE *fp;
     char fileName[] = "./nms.cl";
@@ -348,7 +362,7 @@ void nms_gpu_src(float *xmins, float *ymins, float *widths, float *heights, int 
     source_str = (char*) malloc(0x100000);
     source_size = fread(source_str, 1, 0x100000, fp);
     fclose(fp);
-    printf("HERE2\n");
+
     /* Get Platform and Device Info */
     ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
     ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1, &device_id, &ret_num_devices);
@@ -366,57 +380,35 @@ void nms_gpu_src(float *xmins, float *ymins, float *widths, float *heights, int 
 
     /* Create OpenCL kernel */
     nms = clCreateKernel(program, "nms", &ret);
-    printf("HERE3\n");
 
     /* Create Memory Buffer */
     cl_mem g_xmins, g_ymins, g_widths, g_heights, g_order, g_keep; //, g_probs;
-    g_xmins = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * n, NULL, &ret);
+    g_xmins = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*n, NULL, &ret);
     CHK_ERR(ret, __LINE__);
-    g_ymins = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * n, NULL, &ret);
+    g_ymins = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*n, NULL, &ret);
     CHK_ERR(ret, __LINE__);
-    g_widths = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * n, NULL, &ret);
+    g_widths = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*n, NULL, &ret);
     CHK_ERR(ret, __LINE__);
-    g_heights = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * n, NULL, &ret);
+    g_heights = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*n, NULL, &ret);
     CHK_ERR(ret, __LINE__);
-    g_order = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int) * n, NULL, &ret);
+    g_order = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*n, NULL, &ret);
     CHK_ERR(ret, __LINE__);
-    g_keep = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int) * n, NULL, &ret);
-    CHK_ERR(ret, __LINE__);
-    // g_probs = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float), NULL, &ret);
-    // CHK_ERR(ret, __LINE__);
-    printf("HERE4\n");
-    /* Copy data from host CPU to GPU */
-    ret = clEnqueueWriteBuffer(command_queue, g_xmins, 1, 0, sizeof(float) * n,
-                               xmins, 0, NULL, NULL);
-    printf("HERE5a\n");
-    CHK_ERR(ret, __LINE__);
-    ret = clEnqueueWriteBuffer(command_queue, g_ymins, 1, 0, sizeof(float) * n,
-                               ymins, 0, NULL, NULL);
-    printf("HERE5b\n");
-    CHK_ERR(ret, __LINE__);
-    ret = clEnqueueWriteBuffer(command_queue, g_widths, 1, 0, sizeof(float) * n,
-                               widths, 0, NULL, NULL);
-    printf("HERE5c\n");
-    CHK_ERR(ret, __LINE__);
-    ret = clEnqueueWriteBuffer(command_queue, g_heights, 1, 0, sizeof(float) * n,
-                               heights, 0, NULL, NULL);
-    printf("HERE5d\n");
-    CHK_ERR(ret, __LINE__);
-    ret = clEnqueueWriteBuffer(command_queue, g_order, 1, 0, sizeof(int) * n,
-                               order, 0, NULL, NULL);
-    printf("HERE5e\n");
-    CHK_ERR(ret, __LINE__);
-    ret = clEnqueueWriteBuffer(command_queue, g_keep, 1, 0, sizeof(int) * n,
-                               keep, 0, NULL, NULL);
-    printf("HERE5f\n");
-    CHK_ERR(ret, __LINE__);
-    printf("HERE5fb\n");
-    // ret = clEnqueueWriteBuffer(command_queue, g_probs, 1, 0, sizeof(float),
-    //                            probs, 0, NULL, NULL);
-    printf("HERE5g\n");
+    g_keep = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*n, NULL, &ret);
     CHK_ERR(ret, __LINE__);
 
-    printf("HERE5\n");
+    /* Copy data from host CPU to GPU */
+    ret = clEnqueueWriteBuffer(command_queue, g_xmins, 1, 0, sizeof(float)*n, xmins, 0, NULL, NULL);
+    CHK_ERR(ret, __LINE__);
+    ret = clEnqueueWriteBuffer(command_queue, g_ymins, 1, 0, sizeof(float)*n, ymins, 0, NULL, NULL);
+    CHK_ERR(ret, __LINE__);
+    ret = clEnqueueWriteBuffer(command_queue, g_widths, 1, 0, sizeof(float)*n, widths, 0, NULL, NULL);
+    CHK_ERR(ret, __LINE__);
+    ret = clEnqueueWriteBuffer(command_queue, g_heights, 1, 0, sizeof(float)*n, heights, 0, NULL, NULL);
+    CHK_ERR(ret, __LINE__);
+    ret = clEnqueueWriteBuffer(command_queue, g_order, 1, 0, sizeof(int)*n, order, 0, NULL, NULL);
+    CHK_ERR(ret, __LINE__);
+    ret = clEnqueueWriteBuffer(command_queue, g_keep, 1, 0, sizeof(int)*n, keep, 0, NULL, NULL);
+    CHK_ERR(ret, __LINE__);
 
     /* Set OpenCL Kernel Arguments */
     ret = clSetKernelArg(nms, 0, sizeof(cl_mem), &g_xmins);
@@ -435,44 +427,32 @@ void nms_gpu_src(float *xmins, float *ymins, float *widths, float *heights, int 
     CHK_ERR(ret, __LINE__);
     ret = clSetKernelArg(nms, 7, sizeof(int), &n);
     CHK_ERR(ret, __LINE__);
-    // ret = clSetKernelArg(nms, 8, sizeof(cl_mem), &g_probs);
-    // CHK_ERR(ret, __LINE__);
 
     /* Define the global and local workgroup sizes */
     size_t global_work_size[1] = {n*(n-1) + (128 - (n*(n-1) % 128))};
     size_t local_work_size[1] = {128};
 
-    printf("HERE6\n");
     /* Call kernel on the GPU */
     ret = clEnqueueNDRangeKernel(command_queue,
                                  nms,
-                                 1,//work_dim,
-                                 NULL, //global_work_offset
-                                 global_work_size, //global_work_size
-                                 local_work_size, //local_work_size
-                                 0, //num_events_in_wait_list
-                                 NULL, //event_wait_list
-                                 NULL //
-                                );
-    CHK_ERR(ret, __LINE__);
-    printf("HERE7\n");
-    /* Read result of GPU on host CPU */
-    ret = clEnqueueReadBuffer(command_queue, g_keep, 1, 0, sizeof(float) * n,
-                              keep, 0, NULL, NULL);
+                                 1,                 //work_dim,
+                                 NULL,              //global_work_offset
+                                 global_work_size,  //global_work_size
+                                 local_work_size,   //local_work_size
+                                 0,                 //num_events_in_wait_list
+                                 NULL,              //event_wait_list
+                                 NULL);
     CHK_ERR(ret, __LINE__);
 
-    //for (int i = 0; i < n; i++)
-    //    printf("value:%d", keep[i]);
-    printf("HERE8\n");
+    /* Read result of GPU on host CPU */
+    ret = clEnqueueReadBuffer(command_queue, g_keep, 1, 0, sizeof(float)*n, keep, 0, NULL, NULL);
+    CHK_ERR(ret, __LINE__);
+
     /* Shut down the OpenCL runtime */
     ret = clFlush(command_queue);
     ret = clFinish(command_queue);
     ret = clReleaseKernel(nms);
     ret = clReleaseProgram(program);
-
-    //free(h_boxes);
-    //free(h_order);
-    //free(h_keep);
 
     clReleaseMemObject(g_xmins);
     clReleaseMemObject(g_ymins);
@@ -480,8 +460,6 @@ void nms_gpu_src(float *xmins, float *ymins, float *widths, float *heights, int 
     clReleaseMemObject(g_heights);
     clReleaseMemObject(g_order);
     clReleaseMemObject(g_keep);
-    // clReleaseMemObject(g_probs);
     clReleaseCommandQueue(command_queue);
     clReleaseContext(context);
-    printf("HERE9\n");
 }

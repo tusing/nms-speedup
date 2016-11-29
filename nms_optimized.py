@@ -14,11 +14,8 @@ def nms_preprocess(boxes, probs, threshold, form='lowerleft'):
         boxes = [bbox_center_to_lowerleft(b) for b in boxes]
 
     n = len(boxes)
-
     order = probs.argsort()[::-1].tolist()
     c_order = (ctypes.c_int * n)(*order)
-
-
     boxes = [boxes[order[j]] for j in range(n)]
 
     c_xmin = [box[0] for box in boxes]
@@ -31,15 +28,13 @@ def nms_preprocess(boxes, probs, threshold, form='lowerleft'):
     c_w = (ctypes.c_float*n)(*c_w)
     c_h = (ctypes.c_float*n)(*c_h)
 
-
     keep = [1] * n
     c_keep = (ctypes.c_int * n)(*keep)
-
     c_threshold = (ctypes.c_float)(float(threshold))
-
     c_len = (ctypes.c_int)(n)
 
     return (c_xmin, c_ymin, c_w, c_h, c_order, c_keep, c_threshold, c_len)
+
 
 def nms_harness(c_func, boxes, probs, threshold, form='lowerleft', ordered=False, benchmarked=False):
     assert form in ['center', 'diagonal', 'lowerleft'], 'bounding box format not accepted: {}.'.format(form)
@@ -59,7 +54,6 @@ def nms_harness(c_func, boxes, probs, threshold, form='lowerleft', ordered=False
         c_order = (ctypes.c_int)(*empty)
         c_probs = (ctypes.c_float * n)(*probs)
 
-
     c_xmin = [box[0] for box in boxes]
     c_ymin = [box[1] for box in boxes]
     c_w = [box[2] for box in boxes]
@@ -70,13 +64,11 @@ def nms_harness(c_func, boxes, probs, threshold, form='lowerleft', ordered=False
     c_w = (ctypes.c_float*n)(*c_w)
     c_h = (ctypes.c_float*n)(*c_h)
 
-
     keep = [1] * n
     c_keep = (ctypes.c_int * n)(*keep)
-
     c_threshold = (ctypes.c_float)(float(threshold))
-
     c_len = (ctypes.c_int)(n)
+    
     if benchmarked:
         starttime = time.time()
     c_func(c_xmin, c_ymin, c_w, c_h, c_order, c_keep, c_threshold, c_len, c_probs) # Work should be done in here

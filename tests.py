@@ -8,7 +8,6 @@ import os
 import glob
 import sys
 
-
 def test_correctness(nmsfunc):
     testboxes, testprobs = read_binary_file("dataset/boxes.dat")
     # import ipdb; ipdb.set_trace()
@@ -27,10 +26,7 @@ def test_correctness(nmsfunc):
     return True
 
 def test_correctness_car_dataset(nmsfunc):
-    '''
-    Test a single data file in the folder data, even this can take >5 minutes
-    because the serial implementation is so slow
-    '''
+    ''' Test a single data file in the folder data, even this can take >5 minutes because the serial implementation is so slow. '''
     path = './data'
     for filename in glob.glob(os.path.join(path, '*.txt')):
         testboxes, testprobs = read_text_file(filename)
@@ -64,11 +60,9 @@ def benchmark_full_dataset(nmsfunc, max_images=10000000, verbose=False):
         testboxes = map(bbox_center_to_diagonal, testboxes)
 
         testprobs = np.asarray(testprobs)
-
         testthreshold = 0.2
-        # starttime = time.time()
         testkeeps, endtime = nmsfunc(testboxes, testprobs, testthreshold, "lowerleft", True)
-        # endtime = time.time() - starttime
+
         n += 1
         running_avg = (running_avg*(n-1))/n + endtime/n
         if verbose:
@@ -113,18 +107,6 @@ def benchmark_and_check_accuracy_full_dataset(nmsfunc):
     print("Total time: " + str(total_time))
     print("Average Speed per file: " + str(running_avg))
 
-# def benchmark(nmsfunc):
-#     testboxes, testprobs = read_binary_file("dataset/boxes.dat")
-#     testprobs = np.asarray(testprobs)
-#     testthresholds = [random.random() for i in range(20)]
-
-#     starttime = time.time()
-#     for testthreshold in testthresholds:
-#         testkeeps = nmsfunc(testboxes, testprobs, testthreshold, "lowerleft")
-#     endtime = time.time() - starttime
-
-#     print(endtime)
-
 def benchmark_multiple(functions, max_images=10000000, verbose=False):
     results = dict()
     fastest_function = None
@@ -147,13 +129,13 @@ def benchmark_multiple(functions, max_images=10000000, verbose=False):
     print("-----------------------------------------------------------------")
     for function_name in results:
         multipleC = "%.3f" % (results["Serial_c"][1]/results[function_name][1])
-        # multiplePy = "%.3f" % (results["Serial_py"][1]/results[function_name][1])
-        print(function_name + "\t" + multipleC + "x")#\t" + multiplePy + "x")
+        multiplePy = "%.3f" % (results["Serial_py"][1]/results[function_name][1])
+        print(function_name + "\t" + multipleC + "x\t" + multiplePy + "x")
     print("-----------------------------------------------------------------")
 
 
 nms_functions = dict()
-# nms_functions["Serial_py"] = nms_serial
+nms_functions["Serial_py"] = nms_serial
 nms_functions["Serial_c"] = nms_c
 nms_functions["Serial_Unordered"] = nms_c_unsorted_src
 nms_functions["SIMD"] = nms_simd
@@ -177,12 +159,6 @@ if __name__ == "__main__":
         print("gpu")
         test_correctness(nms_gpu)
 
-    # benchmark(nms_serial)
-    # benchmark(nms_c)
-    # benchmark(nms_simd)
-    # benchmark(nms_omp)
-
-
     if len(sys.argv) > 1 and "-f" in sys.argv or"-fv" in sys.argv:
         if "-f" in sys.argv:
             nextElemIndex = sys.argv.index("-f") + 1
@@ -199,10 +175,3 @@ if __name__ == "__main__":
         else:
             print("ERROR -f[v] [number of image]")
             print("full data benchmark expects an integer argument for the number of images to test, or -1 to test all images")
-        # benchmark_full_dataset(nms_serial, 2)
-
-
-    # if len(sys.argv) > 1 and "-c" in sys.argv:
-    #     test_correctness_car_dataset(nms_c)
-
-    # benchmark_and_check_accuracy_full_dataset(nms_c)
