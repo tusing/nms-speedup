@@ -382,7 +382,7 @@ void nms_gpu_src(float *xmins, float *ymins, float *widths, float *heights, int 
     nms = clCreateKernel(program, "nms", &ret);
 
     /* Create Memory Buffer */
-    cl_mem g_xmins, g_ymins, g_widths, g_heights, g_order, g_keep; //, g_probs;
+    cl_mem g_xmins, g_ymins, g_widths, g_heights, g_order, g_keep;
     g_xmins = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*n, NULL, &ret);
     CHK_ERR(ret, __LINE__);
     g_ymins = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*n, NULL, &ret);
@@ -453,7 +453,6 @@ void nms_gpu_src(float *xmins, float *ymins, float *widths, float *heights, int 
     ret = clFinish(command_queue);
     ret = clReleaseKernel(nms);
     ret = clReleaseProgram(program);
-
     clReleaseMemObject(g_xmins);
     clReleaseMemObject(g_ymins);
     clReleaseMemObject(g_widths);
