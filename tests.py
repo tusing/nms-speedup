@@ -11,7 +11,7 @@ import sys
 
 def test_correctness(nmsfunc):
     testboxes, testprobs = read_binary_file("dataset/boxes.dat")
-    import ipdb; ipdb.set_trace()
+    # import ipdb; ipdb.set_trace()
     testboxes = testboxes
     testprobs = np.asarray(testprobs)
     testthresholds = [0.1 * i for i in range(0, 10)]

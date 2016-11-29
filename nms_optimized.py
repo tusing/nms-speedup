@@ -49,14 +49,14 @@ def nms_harness(c_func, boxes, probs, threshold, form='lowerleft', ordered=False
         boxes = [bbox_center_to_lowerleft(b) for b in boxes]
 
     n = len(boxes)
-
+    empty = [0];
     if ordered:
         order = probs.argsort()[::-1].tolist()
         c_order = (ctypes.c_int * n)(*order)
-        c_probs = (ctypes.c_float)(0)
+        c_probs = (ctypes.c_float)(*empty)
         boxes = [boxes[order[j]] for j in range(n)]
     else:
-        c_order = (ctypes.c_int)(0)
+        c_order = (ctypes.c_int)(*empty)
         c_probs = (ctypes.c_float * n)(*probs)
 
 
@@ -120,5 +120,6 @@ def nms_simd(boxes, probs, threshold, form='lowerleft', benchmarked=False):
     return nms_harness(nms.nms_simd_src, boxes, probs, threshold, form, ordered, benchmarked)
 
 # GPU optimized NMS
-def nms_gpu(boxes, probs, threshold, form='lowerleft', ordered=True, benchmarked=False):
+def nms_gpu(boxes, probs, threshold, form='lowerleft', benchmarked=False):
+    ordered=True
     return nms_harness(nms.nms_gpu_src, boxes, probs, threshold, form, ordered, benchmarked)
