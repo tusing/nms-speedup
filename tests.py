@@ -119,20 +119,21 @@ def benchmark_multiple(functions, max_images=10000000, verbose=False):
                 fastest_function_time = running_avg
                 fastest_function = function_name
     print("")
+    print("Function\tTotal Time\tAvg. Time Per Image")
+    print("{:<16}{:<16}{:<16}".format("Function Name", "Total Time", "Avg. Time/Image"))
     print("-----------------------------------------------------------------")
     for function_name in results:
-        print(function_name + ": TOTAL TIME=" + str(results[function_name][0]) + " AVERAGE TIME PER IMAGE=" + str(results[function_name][1]))
+        print("{:<16}{:<16}{:<16}".format(function_name, str(results[function_name][0]), str(results[function_name][1])))
     print("Fastest function is " + fastest_function + ".")
     print("")
     print("")
-    print("Function\tC Speedup\tPython Speedup")
+    print("{:<16}{:<16}{:<16}".format("Function Name", "C Speedup", "Python Speedup"))
     print("-----------------------------------------------------------------")
     for function_name in results:
         multipleC = "%.3f" % (results["Serial_c"][1]/results[function_name][1])
         multiplePy = "%.3f" % (results["Serial_py"][1]/results[function_name][1])
-        print(function_name + "\t" + multipleC + "x\t" + multiplePy + "x")
+        print("{:<16}{:<16}{:<16}".format(function_name, multipleC, multiplePy))
     print("-----------------------------------------------------------------")
-
 
 nms_functions = dict()
 nms_functions["Accurate serial python"] = nms_serial
@@ -142,7 +143,6 @@ nms_functions["Accurate SIMD OMP"] = nms_simd
 nms_functions["Accurate OMP"] = nms_omp
 nms_functions["Inaccurate OMP"] = nms_omp1
 nms_functions["Inaccurate GPU"] = nms_gpu
-
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and "-c" in sys.argv:
