@@ -55,6 +55,7 @@ def benchmark_full_dataset(nmsfunc, max_images=10000000, verbose=False):
     n = 0
     total_time = 0
     running_avg = 0.0
+    running_avg_mflops = 0.0
     for filename in glob.glob(os.path.join(path, '*.txt')):
         testboxes, testprobs = read_text_file(filename)
         testboxes = map(bbox_center_to_diagonal, testboxes)
@@ -62,8 +63,10 @@ def benchmark_full_dataset(nmsfunc, max_images=10000000, verbose=False):
         testprobs = np.asarray(testprobs)
         testthreshold = 0.2
         testkeeps, endtime = nmsfunc(testboxes, testprobs, testthreshold, "lowerleft", True)
+        mflops = compute_MFlops(len(testprobs), endtime)
 
         n += 1
+        running_avg_mflops = (running_avg_mflops*(n-1))/n + mflops/n
         running_avg = (running_avg*(n-1))/n + endtime/n
         if verbose:
             print(filename + ": " + str(endtime) + "  Running Average per file: " + str(running_avg))
@@ -73,7 +76,7 @@ def benchmark_full_dataset(nmsfunc, max_images=10000000, verbose=False):
     if verbose:
         print("Total time: " + str(total_time))
         print("Average Speed per file: " + str(running_avg))
-    return (total_time, running_avg)
+    return (total_time, running_avg, running_avg_mflops)
 
 def benchmark_and_check_accuracy_full_dataset(nmsfunc):
     path = './data'
@@ -107,38 +110,35 @@ def benchmark_and_check_accuracy_full_dataset(nmsfunc):
     print("Total time: " + str(total_time))
     print("Average Speed per file: " + str(running_avg))
 
+def compute_MFlops(n, time):
+    return (10*n*(n-1))/((1024.0*1024.0)*time)
+
 def benchmark_multiple(functions, max_images=10000000, verbose=False):
     results = dict()
     fastest_function = None
     fastest_function_time = sys.maxsize
     for function_name in functions:
         if functions[function_name]:
-            total_time, running_avg = benchmark_full_dataset(functions[function_name], max_images, verbose)
-            results[function_name] = (total_time, running_avg)
+            total_time, running_avg, running_avg_mflops = benchmark_full_dataset(functions[function_name], max_images, verbose)
+            results[function_name] = (total_time, running_avg, running_avg_mflops)
             if running_avg < fastest_function_time:
                 fastest_function_time = running_avg
                 fastest_function = function_name
     print("")
-    print("Function\tTotal Time\tAvg. Time Per Image")
-    print("{:<16}{:<16}{:<16}".format("Function Name", "Total Time", "Avg. Time/Image"))
+    print("Function\tTotal Time\tAvg. Time Per Image\tAvg. Mflops Per Image")
+    print("{:<16}{:<16}{:<16}{:<16}".format("Function Name", "Total Time", "Avg. Time/Image", "Avg. Mflops/Image"))
     print("-----------------------------------------------------------------")
     for function_name in results:
-        print("{:<16}{:<16}{:<16}".format(function_name, str(results[function_name][0]), str(results[function_name][1])))
+        print("{:<16}{:<16}{:<16}{:<16}".format(function_name, str(results[function_name][0]), str(results[function_name][1]), str(results[function_name][2])))
     print("Fastest function is " + fastest_function + ".")
     print("")
     print("")
     print("{:<16}{:<16}{:<16}".format("Function Name", "C Speedup", "Python Speedup"))
     print("-----------------------------------------------------------------")
     for function_name in results:
-<<<<<<< HEAD
         multipleC = "%.3f" % (results["Accurate serial c"][1]/results[function_name][1])
         multiplePy = "%.3f" % (results["Accurate serial python"][1]/results[function_name][1])
-        print(function_name + "\t" + multipleC + "x\t" + multiplePy + "x")
-=======
-        multipleC = "%.3f" % (results["Serial_c"][1]/results[function_name][1])
-        multiplePy = "%.3f" % (results["Serial_py"][1]/results[function_name][1])
         print("{:<16}{:<16}{:<16}".format(function_name, multipleC, multiplePy))
->>>>>>> ab0291d33ebd231e5307bd26eebe3d9a8730647f
     print("-----------------------------------------------------------------")
 
 nms_functions = dict()
