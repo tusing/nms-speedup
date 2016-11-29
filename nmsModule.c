@@ -9,14 +9,12 @@
 #define max(a,b) (((a)>(b))?(a):(b))
 
 
-
 float lowerleft_iou(float* restrict xmins, float* restrict ymins, float* widths, float* heights, int i, int j) {
     // determine the (x, y)-coordinates of the intersection rectangle
     float x0 = max(xmins[i], xmins[j]);
     float y0 = max(ymins[i], ymins[j]);
     float x1 = min(xmins[i] + widths[i], xmins[j] + widths[j]);
     float y1 = min(ymins[i] + heights[i], ymins[j] + heights[j]);
-
 
     float box1Area = widths[i] * heights[i];
     float box2Area = widths[j] * heights[j];
@@ -34,9 +32,7 @@ float lowerleft_iou(float* restrict xmins, float* restrict ymins, float* widths,
         retval = min(1.0, union_area / tot_area); /* Round to 1 bc fp division is sketchy */
     }
 
-
     return retval;
-
 }
 
 __m256 simd_lowerleft_iou(float* restrict xmins, float* restrict ymins, float* widths, float* heights, int i, int j) {
@@ -78,34 +74,6 @@ __m256 simd_lowerleft_iou(float* restrict xmins, float* restrict ymins, float* w
 
 }
 
-void nms_c_unsorted_src(float *xmins, float *ymins, float* widths, float* heights, int *order, int *keep, float threshold, int n, int *probs) {
-    #pragma omp parallel for
-    for(int i=0; i<n; i++) {
-        if(keep[i] == 0) {
-            continue;
-        }
-        for(int j=i+1; j<n; j++) {
-            if (keep[j] == 0) {
-                continue;
-            }
-            float iou_result = lowerleft_iou(xmins, ymins, widths, heights, i, j);
-            //printf("%f\t%d\t%d\t%d\n", iou_result, i, j, order[j]);
-            if(iou_result > threshold) {
-                if (probs[i] > probs[j]) {
-                    keep[j] = 0;
-                } else {
-                    keep[i] = 0;
-                    break;
-                }
-                //printf("%f\n", iou_result);
-                // keep[j] = 0;
-            }
-        }
-    }
-
-
-}
-
 /* 	Scalar naive implementation of NMS, for benchmarking
 	for i in range(len(order)):
 		if not keep[order[i]]:
@@ -127,13 +95,10 @@ void nms_c_src(float *xmins, float *ymins, float* widths, float* heights, int *o
             }
         }
     }
-
-
 }
 
 /* OpenMP Implementation */
 void nms_omp_src(float *xmins, float *ymins, float* widths, float* heights, int *order, int *keep, float threshold, int n, int *probs) {
-
     for(int i=0; i<n; i++) {
         if(keep[i] == 0) {
             continue;
@@ -149,11 +114,34 @@ void nms_omp_src(float *xmins, float *ymins, float* widths, float* heights, int 
             }
         }
     }
-
 }
+
+void nms_c_unsorted_src(float *xmins, float *ymins, float* widths, float* heights, int *order, int *keep, float threshold, int n, int *probs) {
+    #pragma omp parallel for
+    for(int i=0; i<n; i++) {
+        if(keep[i] == 0) {
+            continue;
+        }
+        for(int j=i+1; j<n; j++) {
+            if (keep[j] == 0) {
+                continue;
+            }
+            float iou_result = lowerleft_iou(xmins, ymins, widths, heights, i, j);
+            if(iou_result > threshold) {
+                if (probs[i] > probs[j]) {
+                    keep[j] = 0;
+                } else {
+                    keep[i] = 0;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 /* OpenMP Implementation 2*/
 void nms_omp1_src(float *xmins, float* ymins, float* widths, float* heights, int *order, int *keep, float threshold, int n) {
-#pragma omp parallel for schedule(dynamic, 8) firstprivate(xmins, ymins, widths, heights, order, keep, threshold, n)
+    #pragma omp parallel for schedule(dynamic, 8) firstprivate(xmins, ymins, widths, heights, order, keep, threshold, n)
     for(int i=n-1; i>0; i-=1) {
         for(int j=0; j<i; j++) {
             float iou_result = lowerleft_iou(xmins, ymins, widths, heights, i, j);
@@ -163,41 +151,31 @@ void nms_omp1_src(float *xmins, float* ymins, float* widths, float* heights, int
             }
         }
     }
-
 }
 
 /* Vectorized implementation of NMS, for benchmarking */
 void nms_simd_src(float *xmins, float *ymins, float* widths, float* heights, int *order, int *keep, float threshold, int n, int *probs) {
-
-/* #pragma omp parallel for schedule(dynamic, 1) firstprivate(xmins, ymins, widths, heights, order, keep, threshold, n, probs) */
     for(int i=0; i<n; i++) {
         if(keep[i] == 0) {
             continue;
         }
-
-#pragma omp parallel for firstprivate(xmins, ymins, widths, heights, order, keep, threshold, n, i)
-        for (int j=i+1; j <= n - 8; j += 8){
-
+        #pragma omp parallel for firstprivate(xmins, ymins, widths, heights, order, keep, threshold, n, i)
+        for (int j=i+1; j <= n - 8; j += 8) {
             __m256 results = simd_lowerleft_iou(xmins, ymins, widths, heights, i, j);
             float* iouresult = (float*)&results;
             for (int k = 0; k < 8; k++) {
-                //printf("%f\t%d\t%d\t%d\n", iouresult[k], i, j+k, order[j+k]);
                 if (iouresult[k] > threshold) {
                     keep[j+k] = 0;
                 }
             }
-
-
-
         }
         int j = n - 8;
         while (j < n) {
             float iou_result = lowerleft_iou(xmins, ymins, widths, heights, i, j);
             if(iou_result > threshold) {
                 keep[j] = 0;
-
             }
-            j ++;
+            j++;
         }
     }
 }
