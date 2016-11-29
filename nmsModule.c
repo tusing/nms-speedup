@@ -454,7 +454,7 @@ void nms_gpu_src(float *xmins, float *ymins, float *widths, float *heights, int 
     // CHK_ERR(ret, __LINE__);
 
     /* Define the global and local workgroup sizes */
-    size_t global_work_size[1] = {1024};
+    size_t global_work_size[1] = {n*(n-1) + (128 - (n*(n-1) % 128))};
     size_t local_work_size[1] = {128};
 
     printf("HERE6\n");

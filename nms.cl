@@ -33,8 +33,9 @@ __kernel void nms(__global float *xmins, __global float *ymins, __global float *
     // size_t dim = get_local_size(0);	// how large is my workgroup?
     size_t idx = get_global_id(0);	// where am I in the global index?
 
-    for (int j = idx + 1; j < n; j++) {
-        int i = idx;
+    int i = (idx / n); //floor division
+    int j = i + (idx % n) + 1;
+    if (j < n) {
         float iou_result = 0;
         float x0 = max(xmins[i], xmins[j]);
         float y0 = max(ymins[i], ymins[j]);
