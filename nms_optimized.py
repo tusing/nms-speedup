@@ -93,12 +93,6 @@ def nms_harness(c_func, boxes, probs, threshold, form='lowerleft', ordered=False
     else:
         return keep
 
-
-# C version of NMS, for benchmarking purposes only
-def nms_c_unsorted_src(boxes, probs, threshold, form='lowerleft', benchmarked=False):
-    ordered = False
-    return nms_harness(nms.nms_c_unsorted_src, boxes, probs, threshold, form, ordered, benchmarked)
-
 # C version of NMS, for benchmarking purposes only
 def nms_c(boxes, probs, threshold, form='lowerleft', benchmarked=False):
     ordered = True
@@ -113,6 +107,11 @@ def nms_omp(boxes, probs, threshold, form='lowerleft', benchmarked=False):
 def nms_omp1(boxes, probs, threshold, form='lowerleft', benchmarked=False):
     ordered = True
     return nms_harness(nms.nms_omp1_src, boxes, probs, threshold, form, ordered, benchmarked)
+
+# C version of NMS, for benchmarking purposes only
+def nms_c_unsorted_src(boxes, probs, threshold, form='lowerleft', benchmarked=False):
+    ordered = False
+    return nms_harness(nms.nms_c_unsorted_src, boxes, probs, threshold, form, ordered, benchmarked)
 
 # SIMD NMS
 def nms_simd(boxes, probs, threshold, form='lowerleft', benchmarked=False):
