@@ -126,19 +126,19 @@ def benchmark_multiple(functions, max_images=10000000, verbose=False):
                 fastest_function = function_name
     print("")
     print("Function\tTotal Time\tAvg. Time Per Image\tAvg. Mflops Per Image")
-    print("{:<20}{:<20}{:<20}{:<20}".format("Function Name", "Total Time", "Avg. Time/Image", "Avg. Mflops/Image"))
+    print("{:<25}{:<25}{:<25}{:<25}".format("Function Name", "Total Time", "Avg. Time/Image", "Avg. Mflops/Image"))
     print("-----------------------------------------------------------------")
     for function_name in results:
-        print("{:<20}{:<20}{:<20}{:<20}".format(function_name, str(results[function_name][0]), str(results[function_name][1]), str(results[function_name][2])))
+        print("{:<25}{:<25}{:<25}{:<25}".format(function_name, str(results[function_name][0]), str(results[function_name][1]), str(results[function_name][2])))
     print("Fastest function is " + fastest_function + ".")
     print("")
     print("")
-    print("{:<20}{:<20}{:<20}".format("Function Name", "C Speedup", "Python Speedup"))
+    print("{:<25}{:<25}{:<25}".format("Function Name", "C Speedup", "Python Speedup"))
     print("-----------------------------------------------------------------")
     for function_name in results:
         multipleC = "%.3f" % (results["Accurate serial c"][1]/results[function_name][1])
         multiplePy = "%.3f" % (results["Accurate serial python"][1]/results[function_name][1])
-        print("{:<20}{:<20}{:<20}".format(function_name, multipleC, multiplePy))
+        print("{:<25}{:<25}{:<25}".format(function_name, multipleC, multiplePy))
     print("-----------------------------------------------------------------")
 
 nms_functions = dict()
