@@ -140,17 +140,20 @@ def benchmark_multiple(functions, max_images=10000000, verbose=False):
     for function_name in results:
         print(function_name + ": TOTAL TIME=" + str(results[function_name][0]) + " AVERAGE TIME PER IMAGE=" + str(results[function_name][1]))
     print("Fastest function is " + fastest_function + ".")
+    print("")
+    print("")
+    print("Function\tC Speedup\tPython Speedup")
+    print("-----------------------------------------------------------------")
     for function_name in results:
-        if function_name != fastest_function:
-            multiple = "%.3f" % (results[function_name][1]/fastest_function_time)
-            print(fastest_function + " is " + multiple + "x faster than " + function_name + " per image.")
+        multipleC = "%.3f" % (results["Serial_c"][1]/results[function_name][1])
+        # multiplePy = "%.3f" % (results["Serial_py"][1]/results[function_name][1])
+        print(function_name + "\t" + multipleC + "x")#\t" + multiplePy + "x")
     print("-----------------------------------------------------------------")
 
 
 nms_functions = dict()
-
+# nms_functions["Serial_py"] = nms_serial
 nms_functions["Serial_c"] = nms_c
-nms_functions["Serial_py"] = nms_serial
 nms_functions["Serial_Unordered"] = nms_c_unsorted_src
 nms_functions["SIMD"] = nms_simd
 nms_functions["OMP"] = nms_omp
