@@ -48,6 +48,7 @@ def nms_harness(c_func, c_xmin, c_ymin, c_w, c_h, c_order, c_keep, c_threshold, 
     if benchmarked:
         starttime = time.time()
     c_func(c_xmin, c_ymin, c_w, c_h, c_order, c_keep, c_threshold, c_len, c_probs) # Work should be done in here
+    
     if benchmarked:
         elapsed = time.time() - starttime
     keep = [1] * n
@@ -93,7 +94,7 @@ def nms_simd(boxes, probs, threshold, form='lowerleft', benchmarked=False):
 
 # GPU optimized NMS
 def nms_gpu(boxes, probs, threshold, form='lowerleft', benchmarked=False):
-    ordered=True
+    ordered = True
     c_xmin, c_ymin, c_w, c_h, c_order, c_keep, c_threshold, c_len, c_probs, n, order = nms_preprocess(boxes, probs, threshold, form, ordered)
     nms.nms_gpu_mem_transfer(c_xmin, c_ymin, c_w, c_h, c_order, c_keep, c_threshold, c_len, c_probs)
     res = nms_harness(nms.nms_gpu_src, c_xmin, c_ymin, c_w, c_h, c_order, c_keep, c_threshold, c_len, c_probs, n, order, ordered, benchmarked)
