@@ -135,29 +135,20 @@ def benchmark_multiple(functions, max_images=10000000, verbose=False):
 
 
 nms_functions = dict()
-nms_functions["Serial_py"] = nms_serial
-nms_functions["Serial_c"] = nms_c
-nms_functions["Serial_Unordered"] = nms_c_unsorted_src
-nms_functions["SIMD"] = nms_simd
-nms_functions["OMP"] = nms_omp
-nms_functions["OMP_alternate"] = nms_omp1
-nms_functions["GPU"] = nms_gpu
+nms_functions["Accurate serial python"] = nms_serial
+nms_functions["Accurate serial c"] = nms_c
+nms_functions["Inaccurate unordered"] = nms_c_unsorted_src
+nms_functions["Accurate SIMD OMP"] = nms_simd
+nms_functions["Accurate OMP"] = nms_omp
+nms_functions["Inaccurate OMP"] = nms_omp1
+nms_functions["Inaccurate GPU"] = nms_gpu
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and "-c" in sys.argv:
-        print("c_unsorted")
-        test_correctness(nms_c_unsorted_src)
-        print("c_naive_serial")
-        test_correctness(nms_c)
-        print("c_simd")
-        test_correctness(nms_simd)
-        print("c_omp")
-        test_correctness(nms_omp)
-        print("c_omp1")
-        test_correctness(nms_omp1)
-        print("gpu")
-        test_correctness(nms_gpu)
+        for n, f in nms_functions.iteritems():
+            print(n)
+            test_correctness(f)
 
     if len(sys.argv) > 1 and "-f" in sys.argv or"-fv" in sys.argv:
         if "-f" in sys.argv:
