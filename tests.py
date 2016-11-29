@@ -63,7 +63,8 @@ def benchmark_full_dataset(nmsfunc, max_images=10000000, verbose=False):
         testprobs = np.asarray(testprobs)
         testthreshold = 0.2
         testkeeps, endtime = nmsfunc(testboxes, testprobs, testthreshold, "lowerleft", True)
-        mflops = compute_MFlops(len(testprobs), endtime)
+        mflops = compute_MFlops(len(testboxes), len([1 for i in testkeeps if i > 0]), endtime)
+        # print((len(testboxes) + len([1 for i in testkeeps if i > 0]))/2)
 
         n += 1
         running_avg_mflops = (running_avg_mflops*(n-1))/n + mflops/n
@@ -76,6 +77,7 @@ def benchmark_full_dataset(nmsfunc, max_images=10000000, verbose=False):
     if verbose:
         print("Total time: " + str(total_time))
         print("Average Speed per file: " + str(running_avg))
+        print("Average Mflops per file: " + str(running_avg_mflops))
     return (total_time, running_avg, running_avg_mflops)
 
 def benchmark_and_check_accuracy_full_dataset(nmsfunc):
@@ -110,8 +112,9 @@ def benchmark_and_check_accuracy_full_dataset(nmsfunc):
     print("Total time: " + str(total_time))
     print("Average Speed per file: " + str(running_avg))
 
-def compute_MFlops(n, time):
-    return (10*n*(n-1))/((1024.0*1024.0)*time)
+def compute_MFlops(started, finished, time):
+    # n = started - finished
+    return (10*(finished*(finished-1) + (finished)*started))/((1024.0*1024.0)*time)
 
 def benchmark_multiple(functions, max_images=10000000, verbose=False):
     results = dict()
@@ -125,21 +128,20 @@ def benchmark_multiple(functions, max_images=10000000, verbose=False):
                 fastest_function_time = running_avg
                 fastest_function = function_name
     print("")
-    print("Function\tTotal Time\tAvg. Time Per Image\tAvg. Mflops Per Image")
     print("{:<25}{:<25}{:<25}{:<25}".format("Function Name", "Total Time", "Avg. Time/Image", "Avg. Mflops/Image"))
-    print("-----------------------------------------------------------------")
+    print("--------------------------------------------------------------------------------------------------")
     for function_name in results:
         print("{:<25}{:<25}{:<25}{:<25}".format(function_name, str(results[function_name][0]), str(results[function_name][1]), str(results[function_name][2])))
     print("Fastest function is " + fastest_function + ".")
     print("")
     print("")
     print("{:<25}{:<25}{:<25}".format("Function Name", "C Speedup", "Python Speedup"))
-    print("-----------------------------------------------------------------")
+    print("--------------------------------------------------------------------------------------------------")
     for function_name in results:
         multipleC = "%.3f" % (results["Accurate serial c"][1]/results[function_name][1])
         multiplePy = "%.3f" % (results["Accurate serial python"][1]/results[function_name][1])
         print("{:<25}{:<25}{:<25}".format(function_name, multipleC, multiplePy))
-    print("-----------------------------------------------------------------")
+    print("--------------------------------------------------------------------------------------------------")
 
 nms_functions = dict()
 nms_functions["Accurate serial python"] = nms_serial
