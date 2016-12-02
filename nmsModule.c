@@ -345,7 +345,6 @@ static cl_platform_id platform_id = NULL;
 static cl_uint ret_num_devices;
 static cl_uint ret_num_platforms;
 static cl_int ret;
-// static cl_mem g_xmins, g_ymins, g_widths, g_heights, g_order, g_keep;
 
 void nms_gpu_init() {
     FILE *fp;
@@ -381,19 +380,6 @@ void nms_gpu_init() {
     nms = clCreateKernel(program, "nms", &ret);
     printf("GPU Init Complete\n");
 
-    /* Create Memory Buffer */
-    // g_xmins = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*n, NULL, &ret);
-    // CHK_ERR(ret, __LINE__);
-    // g_ymins = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*n, NULL, &ret);
-    // CHK_ERR(ret, __LINE__);
-    // g_widths = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*n, NULL, &ret);
-    // CHK_ERR(ret, __LINE__);
-    // g_heights = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float)*n, NULL, &ret);
-    // CHK_ERR(ret, __LINE__);
-    // g_order = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*n, NULL, &ret);
-    // CHK_ERR(ret, __LINE__);
-    // g_keep = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*n, NULL, &ret);
-    // CHK_ERR(ret, __LINE__);
 }
 
 static cl_mem g_xmins, g_ymins, g_widths, g_heights, g_order, g_keep;
@@ -411,7 +397,7 @@ void nms_gpu_mem_transfer(float *xmins, float *ymins, float *widths, float *heig
     // CHK_ERR(ret, __LINE__);
     g_keep = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(int)*n, NULL, &ret);
     // CHK_ERR(ret, __LINE__);
-    // printf("HERE1");
+
     /* Copy data from host CPU to GPU */
     ret = clEnqueueWriteBuffer(command_queue, g_xmins, 1, 0, sizeof(float)*n, xmins, 0, NULL, NULL);
     // CHK_ERR(ret, __LINE__);
@@ -425,7 +411,7 @@ void nms_gpu_mem_transfer(float *xmins, float *ymins, float *widths, float *heig
     // CHK_ERR(ret, __LINE__);
     ret = clEnqueueWriteBuffer(command_queue, g_keep, 1, 0, sizeof(int)*n, keep, 0, NULL, NULL);
     // CHK_ERR(ret, __LINE__);
-    // printf("HERE2");
+
     /* Set OpenCL Kernel Arguments */
     ret = clSetKernelArg(nms, 0, sizeof(cl_mem), &g_xmins);
     // CHK_ERR(ret, __LINE__);
@@ -445,29 +431,20 @@ void nms_gpu_mem_transfer(float *xmins, float *ymins, float *widths, float *heig
 }
 
 void nms_gpu_mem_cleanup() {
-        /* Shut down the OpenCL runtime */
+        
+    /* Shut down the OpenCL runtime */
     ret = clFlush(command_queue);
-    // ret = clFinish(command_queue);
-    // ret = clReleaseKernel(nms);
-    // ret = clReleaseProgram(program);
     clReleaseMemObject(g_xmins);
     clReleaseMemObject(g_ymins);
     clReleaseMemObject(g_widths);
     clReleaseMemObject(g_heights);
     clReleaseMemObject(g_order);
     clReleaseMemObject(g_keep);
-    // clReleaseCommandQueue(command_queue);
-    // clReleaseContext(context);
 }
 
 /* GPU implementation of NMS, for benchmarking, Partially sourced from previous homeworks. */
 void nms_gpu_src(float *xmins, float *ymins, float *widths, float *heights, int *order, int *keep, float threshold, int n, float *probs) {
-    // printf("HERE0");
-    // fflush(stdout);
-    /* Create Memory Buffer */
-    
-    // CHK_ERR(ret, __LINE__);
-    // printf("HERE3");
+
     /* Define the global and local workgroup sizes */
     size_t global_work_size[1] = {n*(n-1) + (128 - (n*(n-1) % 128))};
     size_t local_work_size[1] = {128};
