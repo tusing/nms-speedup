@@ -18,27 +18,28 @@ def nms_preprocess(boxes, probs, threshold, form='lowerleft', ordered=False):
     n = len(boxes)
     empty = [0];
     if ordered:
-        order = probs.argsort()[::-1].tolist()
-        c_order = (ctypes.c_int * n)(*order)
+        order = probs.argsort()[::-1].tolist() + 8 * [0]
+        c_order = (ctypes.c_int * (n + 8))(*order)
         c_probs = (ctypes.c_float)(*empty)
         boxes = [boxes[order[j]] for j in range(n)]
     else:
         order = -1
         c_order = (ctypes.c_int)(*empty)
-        c_probs = (ctypes.c_float * n)(*probs)
+        probs = probs.tolist() + 8 * [0.0]
+        c_probs = (ctypes.c_float * (n + 8))(*probs)
 
-    c_xmin = [box[0] for box in boxes]
-    c_ymin = [box[1] for box in boxes]
-    c_w = [box[2] for box in boxes]
-    c_h = [box[3] for box in boxes]
+    c_xmin = [box[0] for box in boxes] + 8 * [0.0]
+    c_ymin = [box[1] for box in boxes] + 8 * [0.0]
+    c_w = [box[2] for box in boxes] + 8 * [0.0]
+    c_h = [box[3] for box in boxes] + 8 * [0.0]
 
-    c_xmin = (ctypes.c_float*n)(*c_xmin)
-    c_ymin = (ctypes.c_float*n)(*c_ymin)
-    c_w = (ctypes.c_float*n)(*c_w)
-    c_h = (ctypes.c_float*n)(*c_h)
+    c_xmin = (ctypes.c_float*(n + 8))(*c_xmin)
+    c_ymin = (ctypes.c_float*(n + 8))(*c_ymin)
+    c_w = (ctypes.c_float*(n + 8))(*c_w)
+    c_h = (ctypes.c_float*(n + 8))(*c_h)
 
-    keep = [1] * n
-    c_keep = (ctypes.c_int * n)(*keep)
+    keep = [1] * (n + 8)
+    c_keep = (ctypes.c_int * (n + 8))(*keep)
     c_threshold = (ctypes.c_float)(float(threshold))
     c_len = (ctypes.c_int)(n)
 

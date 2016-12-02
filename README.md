@@ -18,3 +18,4 @@ Run correctness on single file from bichen's data
 python tests.py -c
 ~~~~
 
+Note: Performance results are very sensitive to load on the hive machines. If under load, OpenMP implementations severely cripple performance
