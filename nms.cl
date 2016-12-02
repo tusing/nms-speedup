@@ -100,20 +100,3 @@ __kernel void nms_uo(__global float *xmins, __global float *ymins, __global floa
         }
     }
 }
-
-// __kernel void alt_nms(__global float *xmins, __global float *ymins, __global float *widths, __global float *heights, __global int *order, __global int *keep, float threshold, int n) {
-//
-//     size_t tid = get_local_id(0);   // where am I in the workgroup?
-//     size_t gid = get_group_id(0);   // which workgroup am I in?
-//     size_t dim = get_local_size(0); // how large is my workgroup?
-//     size_t idx = get_global_id(0);  // where am I in the global index?
-//
-//     i = (idx / n) //floor division
-//     j = i + (idx % n) + 1
-//     if (j < n) {
-//         float iou_result = lowerleft_iou(xmins, ymins, widths, heights, i, j);
-//         if (iou_result > threshold) {
-//             keep[j] = 0;
-//         }
-//     }
-// }
