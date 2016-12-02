@@ -101,7 +101,3 @@ def nms_gpu(boxes, probs, threshold, form='lowerleft', benchmarked=False):
     res = nms_harness(nms.nms_gpu_src, c_xmin, c_ymin, c_w, c_h, c_order, c_keep, c_threshold, c_len, c_probs, n, order, ordered, benchmarked)
     nms.nms_gpu_mem_cleanup()
     return res
-# GPU optimized NMS
-# def nms_gpu_uo(boxes, probs, threshold, form='lowerleft', benchmarked=False):
-#     ordered=False
-#     return nms_harness(nms.nms_gpu_src_uo, boxes, probs, threshold, form, ordered, benchmarked)
