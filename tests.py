@@ -151,7 +151,7 @@ nms_functions["Accurate OMP"] = nms_omp
 nms_functions["Inaccurate OMP"] = nms_omp1
 nms_functions["Inaccurate unordered"] = nms_c_unsorted_src
 nms_functions["Inaccurate GPU"] = nms_gpu
-# nms_functions["Inaccurate GPU unordered"] = nms_gpu_uo
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and "-c" in sys.argv:
