@@ -287,7 +287,7 @@ void nms_omp1_src(float *xmins, float* ymins, float* widths, float* heights, int
 
 /* parallel C implementation, without probability sorting */
 void nms_c_unsorted_src(float *xmins, float *ymins, float* widths, float* heights, int *order, int *keep, float threshold, int n, float *probs) {
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic, 1)
     for(int i=0; i<n; i++) {
         if(keep[i] == 0) {
             continue;
