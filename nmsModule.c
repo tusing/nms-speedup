@@ -316,23 +316,23 @@ void nms_simd_src(float *xmins, float *ymins, float* widths, float* heights, int
             continue;
         }
         #pragma omp parallel for firstprivate(xmins, ymins, widths, heights, order, keep, threshold, n, i)
-        for (int j=i+1; j <= n - 8; j += 8) {
+        for (int j=i+1; j < n; j += 8) {
             __m256 results = simd_lowerleft_iou(xmins, ymins, widths, heights, i, j);
             float* iouresult = (float*)&results;
-            for (int k = 0; k < 8; k++) {
+            for (int k = 0, m = j; k < 8 && j < n; k++, m++) {
                 if (iouresult[k] > threshold) {
-                    keep[j+k] = 0;
+                    keep[m] = 0;
                 }
             }
         }
-        int j = n - 8;
-        while (j < n) {
-            float iou_result = lowerleft_iou(xmins, ymins, widths, heights, i, j);
-            if(iou_result > threshold) {
-                keep[j] = 0;
-            }
-            j++;
-        }
+        /* int j = n - 8; */
+        /* while (j < n) { */
+        /*     float iou_result = lowerleft_iou(xmins, ymins, widths, heights, i, j); */
+        /*     if(iou_result > threshold) { */
+        /*         keep[j] = 0; */
+        /*     } */
+        /*     j++; */
+        /* } */
     }
 }
 
