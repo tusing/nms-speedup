@@ -1,8 +1,8 @@
 CC = gcc
 
-OPTS = -pthread -O3 -fPIC -fopenmp -funroll-loops
-CFLAGS = -Wall -shared -std=gnu99 $(OPTS)
-LFLAGS = -shared -Bsymbolic-functions 
+OPTS = -pthread -O2 -fPIC -fopenmp -funroll-loops -mavx -march=corei7-avx
+CFLAGS = -Wall -shared -std=gnu99 $(OPTS) -I/usr/local/cuda-7.5/include
+LFLAGS = -shared -Bsymbolic-functions -L/usr/local/cuda-7.5/lib64 -lOpenCL
 
 targets : nms.so
 
@@ -12,7 +12,7 @@ all: clean $(targets)
 
 
 nms.so : nmsModule.c
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS)  $< -o $@ $(LFLAGS)
 
 clean:
 	rm -f *.so *.o
